@@ -5,11 +5,14 @@ const port=3000;
 const {mongoose} =require('./db/mongoose');
 const hbs=require('hbs');
 //var popup = require('popups');
-
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
 const bycrypt=require('bcryptjs');
 const session=require('express-session');
 const {Hotel}=require('./models/hotel');
 const {User}=require('./models/user');
+const {Room}=require('./models/room');
+const {Search}=require('./models/search');
 const {Wishlist}=require('./models/wishlist');
 var app=express();
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -21,10 +24,18 @@ hbs.registerHelper('getCurretnYear',()=>{           //to render the values into 
   return new Date().getFullYear()
 });
 //session variables
+
 app.use(session({secret:'abc123',saveUninitialized:false,resave: false}));
 app.get('/',(req,resp)=>{
  resp.render('index.hbs');
   });
+ 
+  app.get('/addCity',(req,res)=>{
+    res.render('addCity.hbs');
+  });
+  app.get('updateCity',(req,res)=>{
+    res.render('updateCity.hbs');
+  })
   app.get('/register',(req,res)=>{
     res.render('register.hbs');
   })
@@ -61,12 +72,19 @@ app.get('/',(req,resp)=>{
           output:'User already registered'
         });
       }else{
-               
+               User.findOne({},(err,result1)=>{
+                 if(err) throw err;
+                 var user_id;
+                 if(result1==null){
+                   user_id=1;
+                 }else{
+                  user_id=result1.user_id+1;
+                 }
                 let hash = bycrypt.hashSync(body.password, 10);
                 
                 console.log('password',hash);
                 var obj={
-                  
+                  'user_id':user_id,
                   'email':body.email,
                   'password':hash,
                   'name':body.fname,
@@ -76,7 +94,9 @@ app.get('/',(req,resp)=>{
                 var user=new User(obj);
                 user.save().then(()=>{
                   res.status(200).render('index.hbs');
-                })
+                });
+               }).sort({'user_id':1})
+                
                 // User.insertMany(obj,(err,result)=>{
                 //   if(err) throw err;
                 //   console.log('successful',result);
@@ -134,12 +154,16 @@ app.post('/home',(req,res)=>{
   res.status(200).write('<script type="text/javascript">location.href = "search?page=1";</script>');
 });
 app.get('/search',(req,res)=>{
+  
   var pagenumber=req.query.page;
+  var feature_id=req.query.feature;
+  console.log(pagenumber,feature_id);
+  app.locals.feature_id=feature_id;
   app.locals.pagenumber=pagenumber;
   res.render('search.hbs'); 
 });
 app.post('/search',(req,res)=>{
-
+var feature_id=app.locals.feature_id;
 var hotel_id=app.locals.obj2.hotel_id;
 var check_in=app.locals.obj2.check_in;
 var check_out=app.locals.obj2.check_out;
@@ -155,8 +179,25 @@ if(req.body.filter_text!="Hotel name...")  {
   name_filter=req.body.filter_text;
   name_filter_flag=true;
 }  
-console.log(hotel_id,check_in,check_out,noOfPersons,name_filter,name_filter_flag,pagenumber);
-res.send({hotel_id});
+var limit=end-start;
+if(name_filter_flag && feature_id!=null){
+  bothfeatures(feature_id,hotel_id,occupancy,check_in,check_out,room_type,limit,(result1)=>{
+    res.render('search.hbs',{output:result1});
+  });
+}else if(name_filter_flag){
+filters(hotel_id,occupancy,check_in,check_out,room_type,limit,(result2)=>{
+  res.render('search.hbs',{output:result2});
+});
+}else if(feature_id){
+  features(feature_id,hotel_id,occupancy,check_in,check_out,limit,(result3)=>{
+    res.render('search.hbs',{output:result3});
+  });
+}else{
+  nofeatures(hotel_id,occupancy,check_in,check_out,limit,(result4)=>{
+    res.render('search.hbs',{output:result4});
+  });
+}
+
 });
 
 //add to wishlist
@@ -190,9 +231,82 @@ app.get('/wishlist',(req,res)=>{
   });
   
 });
+app.get('/single',(req,res)=>{
+  res.render('single.hbs');
+});
+app.get('/manageHotel',(req,res)=>{
+var deleteRoom=req.query.deleteId;
+MongoClient.connect(url,function(err,db){
+if(err) throw err;
+var dbo=db.db("hotel_reservation");
+dbo.collection("hotels").find({'status':1}).toArray((err,results)=>{
+if(err) throw err;
+if(deleteRoom!=null){
+   Hotel.findOneAndUpdate({hotel_id:deleteRoom},{$set:{'status':0}},{new:true},(err,docs)=>{
+     //console.log(docs);
+    res.redirect('/manageHotel');
+   });
+}else{
+//console.log(results);
+res.status(200).render('manageHotel.hbs',{output:results});
+}
+});
+});
+
+});
 app.get('/success',(req,res)=>{
-  res.send(app.locals.obj2);
-})
+ Hotel.findOne({},(err,res)=>{
+   if(err) throw err;
+   console.log(res);
+ }).sort({'hotel_id':-1});
+});
+
+function bothfeatures(feature_id,hotel_id,occupancy,check_in,check_out,room_type,limit,callback){
+  MongoClient.connect(url,function(err,db){
+    if(err) throw err;
+    var dbo=db.db("hotel_reservation");
+  dbo.collection("search").find({'feature_id':feature_id,'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1,'room_type':room_type}
+    ).limit(limit).toArray((e,result)=>{
+        if(e) throw e;
+        db.close();
+        callback(result);
+});
+  });
+};
+function filters(hotel_id,occupancy,check_in,check_out,room_type,limit,callback){
+  MongoClient.connect(url,function(err,db){
+    if(err) throw err;
+    var dbo=db.db("hotel_reservation");
+    dbo.collection("search").find({'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1,'room_type':room_type}
+      ).limit(limit).toArray((e,result)=>{
+      if(e) throw e;
+      db.close();
+      callback(result);
+});
+  });
+};
+function features(feature_id,hotel_id,occupancy,check_in,check_out,limit,callback){
+  MongoClient.connect(url,function(err,db){
+    if(err) throw err;
+    var dbo=db.db("hotel_reservation");
+    dbo.collection("search").find({'feature_id':feature_id,'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1}
+      ).limit(limit).toArray((e,result)=>{
+      if(e) throw e;
+      db.close();
+      callback(result);
+});});
+};
+
+function nofeatures(hotel_id,occupancy,check_in,check_out,limit,callback){
+  MongoClient.connect(url,function(err,db){
+    if(err) throw err;
+    var dbo=db.db("hotel_reservation");
+    dbo.collection("search").find({'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1}).limit(limit).toArray((e,result)=>{
+      if(e) throw e;
+      db.close();
+      callback(result);
+});});
+};
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
     

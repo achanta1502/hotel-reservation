@@ -4,7 +4,10 @@ const jwt=require('jsonwebtoken');
 const _=require('lodash');
 const bcrypt=require('bcryptjs');
 var  UserSchema= new mongoose.Schema({
-   
+   user_id:{
+    type:Number,
+    required:true
+   },
     email:{
         type:String,
         required:true,
