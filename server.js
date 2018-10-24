@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const port=3000;
 const {mongoose} =require('./db/mongoose');
 const hbs=require('hbs');
+const multer=require('multer');
+
 //var popup = require('popups');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
@@ -20,18 +22,37 @@ app.use(bodyParser.json());
 hbs.registerPartials(__dirname+'/views/partials');   //to inject repeated tags and data in hbsx
 app.set('view engine','hbs');
 app.use(express.static(__dirname + '/public'));
+
+const storage=multer.diskStorage({
+  destination:function(req,file,cb){
+    cb(null, './uploads/');
+  },
+  filename:function(req,file,cb){
+    cb(null,Date.now()+file.originalname);
+  }
+});
+const fileFilter=(req,file,cb)=>{
+  if(file.mimetype==='image/jpeg' || file.mimetype==='image/png'){
+    cb(null,true);
+  }else{
+    cb(null,false);
+  }
+}
+const upload=multer({storage,limits:{
+  fileSize:1024*1024*5
+},fileFilter:fileFilter});
 hbs.registerHelper('getCurretnYear',()=>{           //to render the values into hbs
   return new Date().getFullYear()
 });
 //session variables
-
+app.use(express.static(__dirname + '/uploads'));
 app.use(session({secret:'abc123',saveUninitialized:false,resave: false}));
 app.get('/',(req,resp)=>{
  resp.render('index.hbs');
   });
  
   app.get('/addCity',(req,res)=>{
-    res.render('addCity.hbs');
+    res.status(200).render('addCity.hbs');
   });
   app.get('updateCity',(req,res)=>{
     res.render('updateCity.hbs');
@@ -95,7 +116,7 @@ app.get('/',(req,resp)=>{
                 user.save().then(()=>{
                   res.status(200).render('index.hbs');
                 });
-               }).sort({'user_id':1})
+               }).sort({'user_id':-1})
                 
                 // User.insertMany(obj,(err,result)=>{
                 //   if(err) throw err;
@@ -231,6 +252,7 @@ app.get('/wishlist',(req,res)=>{
   });
   
 });
+
 app.get('/single',(req,res)=>{
   res.render('single.hbs');
 });
@@ -241,6 +263,7 @@ if(err) throw err;
 var dbo=db.db("hotel_reservation");
 dbo.collection("hotels").find({'status':1}).toArray((err,results)=>{
 if(err) throw err;
+db.close();
 if(deleteRoom!=null){
    Hotel.findOneAndUpdate({hotel_id:deleteRoom},{$set:{'status':0}},{new:true},(err,docs)=>{
      //console.log(docs);
@@ -254,12 +277,83 @@ res.status(200).render('manageHotel.hbs',{output:results});
 });
 
 });
-app.get('/success',(req,res)=>{
- Hotel.findOne({},(err,res)=>{
-   if(err) throw err;
-   console.log(res);
- }).sort({'hotel_id':-1});
+app.post('/addCityDetails',(req,res)=>{
+  var body=_.pick(req.body,['name','address','zipcode']);
+  if(!body.name || !body.address || !body.zipcode){
+    res.status(401).render(addCity.hbs);
+  }
+  Hotel.findOne({},(err,result)=>{
+    if(err) throw err;
+    var hotel_id;
+    if(result==null){
+      hotel_id=1;
+    }else{
+      hotel_id=result.hotel_id+1;
+    }
+    var obj={
+      'hotel_id':hotel_id,
+      'city':body.name,
+      'address':body.address,
+      'zipcode':body.zipcode,
+      'status':1
+    };
+    var hotel=new Hotel(obj);
+hotel.save().then(()=>{
+  
+  res.status(200).redirect('/manageHotel');
 });
+  }).sort({'hotel_id':-1});
+});
+app.get('/updateCity',(req,res)=>{
+  var hotel_id=req.query.cityId;
+  app.locals.updateId=hotel_id;
+  Hotel.findOne({'hotel_id':hotel_id,'status':1},(err,result)=>{
+    res.status(200).render('updateCity.hbs',{"city":result.city,'address':result.address,'zipcode':result.zipcode});
+  });
+});
+app.post('/updateCityDetails',(req,res)=>{
+  var body=_.pick(req.body,['name','address','zipcode']);
+  if(!body.name || !body.address || !body.zipcode){
+    res.status(401).redirect('/updateCity');
+  }
+  Hotel.findOneAndUpdate({'hotel_id':app.locals.updateId},{$set:{"city":body.name,'address':body.address,'zipcode':body.zipcode}},{new:true},(err,docs)=>{
+    res.status(200).redirect('/manageHotel');
+  });
+});
+app.get('/roomInfo',(req,res)=>{
+  var hotelId=req.query.city;
+  var page=req.query.page;
+  var search=req.query.search;
+  console.log(hotelId);
+  if(search=='search'){
+
+  }
+  if(hotelId==null){
+  Hotel.find({'status':1},(err,docs)=>{
+    if(err) throw err;  
+    res.render('roomInfo.hbs',{output:docs});   
+  });}else{
+  Hotel.findOne({'hotel_id':hotelId},(err,docs1)=>{
+    if(err) throw err;
+    res.render('roomInfo.hbs',{id:hotelId,cityname:docs1.city});
+  });}
+});
+app.get('/addRoom',(req,res)=>{
+  var hoteId=req.query.hotelId;
+  //app.locals.hoteId=hotelId;
+  res.render('addRoom.hbs');
+});
+app.post('/addRoomDetails',(req,res)=>{
+  var hotelId=app.locals.hoteId;
+  
+});
+app.post('/uploadScripts',upload.single('upload_file'),(req,res)=>{
+ res.render('success.hbs',{name:req.file.filename});
+  
+});
+// app.get('/success',(req,res)=>{
+//  res.render('success.hbs',{output:'8708277e401f26e54dc52b813d89787d'});
+// });
 
 function bothfeatures(feature_id,hotel_id,occupancy,check_in,check_out,room_type,limit,callback){
   MongoClient.connect(url,function(err,db){

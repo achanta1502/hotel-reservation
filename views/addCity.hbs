@@ -25,22 +25,3 @@
     </div>
 </div>
 
-<?php
-    if(isset($_POST['submitted'])){
-        editCity();
-    }
-    function editCity(){
-        try{    
-            $db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
-            $name = $db->quote($_POST["name"]);
-            $address = $db->quote($_POST["address"]);
-            $zipcode = $db->quote($_POST["zipcode"]);
-            $insertQuery =  $db->prepare("INSERT INTO hotel(city_name, address, zipcode, status) VALUES($name, $address, $zipcode,1 )");  
-            $result = $insertQuery->execute();
-            echo '<script type="text/javascript">location.href = "manageHotel.php";</script>';
-        }catch(PDOException $ex){
-            echo "<script type='text/javascript'>alert('$ex');</script>"; 
-        }
-    }
-?>

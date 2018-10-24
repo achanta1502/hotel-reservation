@@ -1,32 +1,23 @@
-<?php  include 'menu.php';
-    require_once('config.php');
-    if(!isset($_SESSION["sess_userid"])){
+{{> menu}}
+    {{!-- if(!isset($_SESSION["sess_userid"])){
         echo '<script type="text/javascript">location.href = "index.php";</script>';
         echo '<script type="text/javascript">alert("please login");</script>';	
     }
-?>
-<?php
-    if(isset($_GET["cityId"])){
-        $db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-        $cityId = $db->quote($_GET["cityId"]);
-        $query = $db->prepare("SELECT * FROM hotel where hotel_id=$cityId and status=1");
-        $query->execute();
-        $cities=$query->fetchAll();
-    }
-?>
+?> --}}
+
 
 <div class="search-page search-grid-full">
     <div class="booking">
         <div class="container">
             <div class="reservation-form">
                 <div class="col-md-9 reservation-right">
-                    <form method="POST" name="cityInfo" class="edit">
+                    <form method="POST" name="cityInfo" class="edit" action='/updateCityDetails'>
                         <h4>City Name</h4>         			
-                        <input type="text" name="name" value="<?php echo $cities[0]["city_name"] ?>" placeholder="City Name" required>
+                        <input type="text" name="name" value="{{city}}" placeholder="City Name" required>
                         <h4>Address</h4>         			
-                        <input type="text" name="address" value="<?php echo $cities[0]["address"] ?>" placeholder="Address" required>
+                        <input type="text" name="address" value="{{address}}" placeholder="Address" required>
                         <h4>Zipcode</h4>         		
-                        <input type="number" name="zipcode" value="<?php echo $cities[0]["zipcode"] ?>" placeholder="Zipcode" required>                        
+                        <input type="number" name="zipcode" value="{{zipcode}}" placeholder="Zipcode" required>                        
                         <input type="submit" name="submitted" class="btn1 btn-1 btn-1e" value="UPDATE NOW">
                     </form>
                 </div>
@@ -35,7 +26,7 @@
     </div>
 </div>
 
-<?php
+{{!-- <?php
     if(isset($_POST['submitted'])){
         editCity();
     }
@@ -54,4 +45,4 @@
             echo "<script type='text/javascript'>alert('$ex');</script>"; 
         }
     }
-?>
+?> --}}
