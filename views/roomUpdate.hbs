@@ -1,13 +1,13 @@
-<?php  include 'menu.php';
-    require_once('config.php');
+{{> menu}}
+    {{!-- require_once('config.php');
     if(!isset($_SESSION["sess_userid"])){
         echo '<script type="text/javascript">location.href = "index.php";</script>';
         echo '<script type="text/javascript">alert("please login");</script>';	
     }
-?>
+?> --}}
 <link href="css/select2.min.css" rel="stylesheet" />
 <script src="js/select2.min.js"></script>
-<?php
+{{!-- <?php
     if(isset($_GET["roomId"])){
         $db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
         $roomId = $db->quote($_GET["roomId"]);
@@ -18,8 +18,8 @@
         $query->execute();
         $featuresSelected=$query->fetchAll();
     }
-?>
-<?php
+?> --}}
+{{!-- <?php
 if(isset($_POST['submit_image'])){
 	$name = $_FILES['upload_file']['name'];
 	list($txt, $ext) = explode(".", $name);
@@ -37,14 +37,14 @@ if(isset($_POST['submit_image'])){
 }
 
 
-?>
+?> --}}
 
 <div class="search-page search-grid-full">
     <div class="booking">
         <div class="container">
             <div class="reservation-form">
                 <div class="col-md-9 reservation-right">
-                    <form action="" method="post" enctype="multipart/form-data">
+                    <form action="/uploadScripts1" method="post" enctype="multipart/form-data">
                         <div class="avatar-upload">
                             <div class="avatar-edit">
                                 <input type='file' id="upload_file" name ="upload_file" accept=".png, .jpg, .jpeg" />
@@ -52,25 +52,26 @@ if(isset($_POST['submit_image'])){
                                 <input type="submit" name='submit_image' value="Upload Image" id="submit_image"/>
                             </div>
                             <div class="avatar-preview">
-                                <div id="imagePreview" style="background-image: url(<?php if ($rooms[0]["image_url"] == "") echo 'images/upload.png'; else  echo $rooms[0]["image_url"];?>);">
+                                <div id="imagePreview" style="">
+                                    <img id='imgsrc' class='imgsrc' src='{{image_url}}' width='192px' height='192px'></img>
                                 </div>
                             </div>
                         </div>
                     </form>
-                    <form method="POST" action="roomUpdate.php?&city=<?php echo $_GET['city']?>&id=<?php echo $rooms[0]["room_id"]?>" name="custInfo" class="edit">
+                    <form method="POST" action="/roomUpdateDetails" name="custInfo" class="edit">
                         <h4>Description</h4>         			
-                        <input type="text" name="desc" value="<?php echo $rooms[0]["room_desc"] ?>" placeholder="Description" required>
+                        <input type="text" name="desc" value="{{room_desc}}" placeholder="Description" required>
                         <h4>Price($)</h4>         			
-                        <input type="number" name="price" value="<?php echo $rooms[0]["price"] ?>" placeholder="Price" required>
+                        <input type="number" name="price" value="{{price}}" placeholder="Price" required>
                         <h4>Room Type</h4>      
-                        <input type="text" name="roomType" value="<?php echo $rooms[0]["room_type"] ?>" placeholder="Room Type" required>
+                        <input type="text" name="roomType" value="{{room_type}}" placeholder="Room Type" required>
                         <h4>Max occupancy</h4>         			
-                        <input type="number" name="max_occupancy" value="<?php echo $rooms[0]["max_occupancy"] ?>" placeholder="Max Occupancy" required>
+                        <input type="number" name="max_occupancy" value="{{max_occupancy}}" placeholder="Max Occupancy" required>
                         <h4>Features</h4>         			
                         <div class="sort-by">
                             <select class="sel" id="features" name="features[]" multiple="multiple">
 
-                                <?php
+                                {{!-- <?php
                                     $db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
                                     $query = $db->prepare("SELECT * FROM features");
                                     $query->execute();
@@ -84,10 +85,15 @@ if(isset($_POST['submit_image'])){
                                                 $selected = true;
                                             }
                                         }
-                                        ?>
-                                    <option value="<?php echo $rows[$i]["feature_id"]?>"
-                                     <?php if($selected) echo 'selected'?>><?php echo $rows[$i]["feature_name"]?></option>  
-                                    <?php }?>
+                                        ?> --}}
+                                        {{#each result.feature_id}}
+                                        <option value="{{feature_id}}" selected>
+                                        {{result.feature_name}}</option>
+                                        {{/each}}
+                                        {{#each docs}}
+                                    <option value="{{feature_id}}">
+                               {{feature_name}} </option>  
+                                    {{/each}}
                             </select>
                         </div><br/><br/>
                         <input type="submit" name="submitted" class="btn1 btn-1 btn-1e" value="UPDATE NOW">
@@ -109,7 +115,7 @@ if(isset($_POST['submit_image'])){
         document.getElementById("submit_image").click();
     };
 </script>
-
+{{!-- 
 <?php
     if(isset($_POST['submitted'])){
         editProfile();
@@ -136,11 +142,11 @@ if(isset($_POST['submit_image'])){
                 $sql = "INSERT INTO room_features VALUES ($id, $featuresList[$featureNo])";
                 $db->exec($sql);
             }
-            $city= $_GET['city'];
-            echo '<script type="text/javascript">location.href = "roomInfo.php?search=search&city='.$city.'";</script>';
-            //header("Location:roomInfo.php");
+            $city= $_GET['city']; --}}
+            {{!-- echo '<script type="text/javascript">location.href = "roomInfo.php?search=search&city='.$city.'";</script>'; --}}
+            {{!-- //header("Location:roomInfo.php");
         }catch(PDOException $ex){
-            echo "<script type='text/javascript'>alert('$ex->getMessage();');</script>"; 
+            {{!-- echo "<script type='text/javascript'>alert('$ex->getMessage();');</script>";  --}}
         }
     }
-?>
+?> --}}

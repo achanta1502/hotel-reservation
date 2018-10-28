@@ -5,16 +5,22 @@ var SearchSchema=new mongoose.Schema({
         required:true
     },
     feature_id:{
-        type:Number,
+        type:Array,
         required:true
+    },
+    feature_name:{
+type:Array,required:true
+    },
+    image_url:{
+type:String
     },
     hotel_id:{
        type:Number,
        required:true 
     },
     booking_id:{
-        type:Number,
-        required:true
+        type:Number
+       
     },
     max_occupancy:{
         type:Number,
@@ -22,6 +28,9 @@ var SearchSchema=new mongoose.Schema({
     },
     check_in:{
         type:Date
+    },
+    room_desc:{
+        type:String
     },
     check_out:{
         type:Date,
@@ -33,9 +42,6 @@ var SearchSchema=new mongoose.Schema({
         type:String
     },
     price:{
-        type:String
-    },
-    feature_name:{
         type:String
     }
 });

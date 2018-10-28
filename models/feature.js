@@ -4,10 +4,7 @@ var FeatureSchema=new mongoose.Schema({
         type:Number,
         required:true
     },
-    room_id:{
-        type:Number,
-        required:true
-    },
+   
     feature_name:{
         type:String
     }
