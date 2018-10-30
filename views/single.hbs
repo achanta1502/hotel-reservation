@@ -1,10 +1,11 @@
-<?php include 'menu.php';
-require_once('config.php');
+{{!-- <?php include 'menu.php'; --}}
+{{!-- require_once('config.php');
 session_start();
 if(!isset($_SESSION["sess_userid"])){
 	echo '<script type="text/javascript">location.href = "index.php";</script>';
 	echo '<script type="text/javascript">alert("please login");</script>';	
-}
+} --}}
+{{> menu}}
 if(isset($_GET["roomId"])){
 	$db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
 	$roomId = $db->quote($_GET["roomId"]);
@@ -57,16 +58,18 @@ if($_GET["src"] === "wishlist"){
 		<div class="col-md-8 single-gd-lt">
 			<div class="single-pg-hdr">
 				<form method="post">
-					<input type="hidden" name="roomId" value="<?php echo $rooms[0]["room_id"] ?>"/>
-					<h2><span class="glyphicon glyphicon-bed" aria-hidden="true"></span><?php echo $rooms[0]["room_type"] ?></h2>
-					<p><b>Max Occupancy:</b> <?php echo $rooms[0]["max_occupancy"]?></p>
-					<?php 
-					if($_GET["src"] === "search"){?>
-					<span class="margin-10"><b>Booking from:</b> <?php echo $_SESSION["check_in"]?>
-					<b>Booking to:</b> <?php echo $_SESSION["check_out"]?></span>
-					<?php }
+					{{#each output}}
+					<input type="hidden" name="roomId" value="{{room_id}}"/>
+					<h2><span class="glyphicon glyphicon-bed" aria-hidden="true"></span>{{room_type}}</h2>
+					<p><b>Max Occupancy:</b> {{max_occupancy}}</p>
+					{{!-- <?php 
+					if($_GET["src"] === "search"){?> --}}
+					<span class="margin-10"><b>Booking from:</b> {{check_in}}
+					<b>Booking to:</b>{{check_out}}</span>
+					{{/each}}
+					{{!-- <?php }
 					else if($_GET["src"] === "wishlist"){
-					?><div class="sf-dates margin-10">
+					?><div class="sf-dates margin-10"> --}}
 						<table class="table-singlepage">
 							<tr>
 								<td>
@@ -169,10 +172,10 @@ if($_GET["src"] === "wishlist"){
             $amountPaid = $db->quote($_POST["amountPaid"]);
             $insertQuery =  $db->prepare("INSERT INTO bookings(room_id, checkin, checkout, user_id, amount_paid, status) values($roomId, $check_in, $check_out,$userId,$amountPaid, 0 )");  
             $result = $insertQuery->execute();
-            echo '<script type="text/javascript">location.href = "booking.php";</script>';
+            {{!-- echo '<script type="text/javascript">location.href = "booking.php";</script>'; --}}
             //header("Location:roomInfo.php"); */
         }catch(PDOException $ex){
-            echo "<script type='text/javascript'>alert('$ex->getMessage();');</script>"; 
+            {{!-- echo "<script type='text/javascript'>alert('$ex->getMessage();');</script>";  --}}
         }
 	}
 	function validateInfo(){
@@ -203,58 +206,13 @@ if($_GET["src"] === "wishlist"){
 			$result = $insertQuery->execute();
 			$deleteQuery =  $db->prepare("DELETE from wishlist where wishlist_id=$wishlist_id");
 			$deleteQuery->execute();
-			echo '<script type="text/javascript">location.href = "home.php";</script>';
+			{{!-- echo '<script type="text/javascript">location.href = "home.php";</script>'; --}}
 		}else{
-			echo '<script type="text/javascript">alert("Try changing date or Number of People.");</script>';
+			{{!-- echo '<script type="text/javascript">alert("Try changing date or Number of People.");</script>'; --}}
 			return false;
 		}
 	}
 ?>
 <!--//single-page-->
 <!--footer-->
-<div class="footer">
-		<div class="container">				 	
-			<div class="col-md-3 ftr_navi ftr">
-				<h3>NAVIGATION</h3>
-				<ul>
-					<li><a href="index.php">Home</a></li>
-					<li><a href="about.php">About</a></li>
-					<li><a href="booking.php">Booking</a></li>
-					<li><a href="contact.php">Contact</a></li>
-				</ul>
-			</div>
-			<div class="col-md-3 ftr_navi ftr">
-					 <h3>FACILITIES</h3>
-					 <ul>
-						 <li><a href="#">Double bedrooms</a></li>
-						 <li><a href="#">Single bedrooms</a></li>
-						 <li><a href="#">Royal facilities</a></li>						
-						 <li><a href="#">Connected rooms</a></li>
-					 </ul>
-			</div>
-			<div class="col-md-3 ftr_navi ftr">
-				<h3>GET IN TOUCH</h3>
-				<ul>
-					<li>6314.001, WPL,</li>
-					<li>University of Texas Dallas</li>
-					<li></li>
-				</ul>
-			</div>
-			<div class="col-md-3 ftr-logo">
-				<a href="index.php"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>Comet Inn</a>
-				<ul>
-					<li><a href="#" class="f1"> </a></li>
-					<li><a href="#" class="f2"> </a></li>
-					<li><a href="#" class="f3"> </a></li>
-				</ul>
-			</div>
-			<div class="clearfix"> </div>
-		</div>
-	</div>
-<!--footer-->
-<!-- copy -->
-<div class="copy-right">
-<div class="container">
-	<p> &copy;2017 Comet Inn. All Rights Reserved | Design by  PHP</p>
-</div>
-</div>
+{{> footer}}

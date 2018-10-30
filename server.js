@@ -21,6 +21,12 @@ var app=express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 hbs.registerPartials(__dirname+'/views/partials');   //to inject repeated tags and data in hbsx
+hbs.registerHelper('times', function(n, block) {
+  var accum = '';
+  for(var i = 1; i <= n; ++i)
+      accum += block.fn(i);
+  return accum;
+});
 app.set('view engine','hbs');
 app.use(express.static(__dirname + '/public'));
 
@@ -182,38 +188,45 @@ app.get('/search',(req,res)=>{
   var hotel_id=app.locals.obj2.hotel_id;
   app.locals.feature_id=feature_id;
   app.locals.pagenumber=pagenumber;
-  nofeatures(hotel_id,2,2,2,4,(result4)=>{
-    res.render('search.hbs',{output:result4});
+  var check_in=app.locals.obj2.check_in;
+var check_out=app.locals.obj2.check_out;
+var noOfPersons=app.locals.obj2.noOfPersons;
+if(feature_id){
+  features(feature_id,hotel_id,noOfPersons,check_in,check_out,5,(result3)=>{
+    res.render('search.hbs',{output:result3,len:result3.length});
+  });}
+  else{
+  nofeatures(hotel_id,noOfPersons,check_in,check_out,5,(result)=>{
+    res.render('search.hbs',{output:result,len:result.length});
   });
+}
 });
 app.post('/search',(req,res)=>{
   var feature_id=req.query.feature;
-//var feature_id=app.locals.feature_id;
+var feature_id=app.locals.feature_id;
 var hotel_id=app.locals.obj2.hotel_id;
-console.log('hotelid',hotel_id);
 var check_in=app.locals.obj2.check_in;
 var check_out=app.locals.obj2.check_out;
 var noOfPersons=app.locals.obj2.noOfPersons;
 var pagenumber=req.query.page;
-//var pagenumber=app.locals.pagenumber;
+var pagenumber=app.locals.pagenumber;
 if(!pagenumber)
     pagenumber=1;
 var start=pagenumber*5-5;
 var end=pagenumber*5;
 var name_filter=""
 var name_filter_flag=false;
-console.log(req.body.filter_text);
 if(req.body.filter_text!="Hotel name...")  {
   name_filter=req.body.filter_text;
   name_filter_flag=true;
 }  
 var limit=end-start;
-console.log(check_in,check_out,pagenumber,noOfPersons,name_filter,name_filter_flag);
-if(name_filter_flag && feature_id!=null){
-  bothfeatures(feature_id,hotel_id,noOfPersons,check_in,check_out,name_filter,limit,(result1)=>{
-    res.render('search.hbs',{output:result1});
-  });
-}else if(name_filter_flag){
+// if(name_filter_flag && feature_id!=null){
+//   bothfeatures(feature_id,hotel_id,noOfPersons,check_in,check_out,name_filter,limit,(result1)=>{
+//     res.render('search.hbs',{output:result1,len:result.length});
+//   });
+// }else 
+if(name_filter_flag){
 filters(hotel_id,noOfPersons,check_in,check_out,name_filter,limit,(result2)=>{
   res.render('search.hbs',{output:result2});
 });
@@ -243,27 +256,69 @@ app.get('/wishlist',(req,res)=>{
       
     }else{
       console.log(room_id,user_id);
-      var obj={
-        'room_id':room_id,
-        'user_id':2,
-        'check_in':Date.parse(app.locals.obj2.check_in),
-        'check_out':Date.parse(app.locals.obj2.check_out),
-        'numberOfPeople':Number.parseInt(app.locals.obj2.noOfPersons)
-      };
-      var wishlist=new Wishlist(obj);
-      wishlist.save().then(()=>{
-        var aler="<script type='text/javascript'>alert('New room added to wishlist');</script>";
-            res.status(200).render('search.hbs',{output:aler});
-      }).catch((err)=>{
-        console.log(err);
+      Wishlist.findOne({},(err,doc)=>{
+        var wishlist_id;
+        if(doc==null){
+          wishlist_id=1;
+        }else{
+          wishlist_id=doc.wishlist_id+1;
+        }
+        Room.findOne({'room_id':room_id},(err,roomdoc)=>{ 
+          var obj={
+          'wishlist_id':wishlist_id,
+          'room_id':room_id,
+          'user_id':2,
+          'check_in':Date.parse(app.locals.obj2.check_in),
+          'check_out':Date.parse(app.locals.obj2.check_out),
+          'numberOfPeople':Number.parseInt(app.locals.obj2.noOfPersons),
+          'room_type':roomdoc.room_type,
+          'image_url':roomdoc.image_url,
+          'status':roomdoc.status,
+          "price":roomdoc.price,
+          'room_desc':roomdoc.room_desc
+        };
+        var wishlist=new Wishlist(obj);
+        wishlist.save().then(()=>{
+          var aler="<script type='text/javascript'>alert('New room added to wishlist');</script>";
+              res.status(200).render('search.hbs',{output:aler});
+        }).catch((err)=>{
+          console.log(err);
+        });
       });
+       
+        
+       
+      }).sort({'wishlist_id':-1})
+     
+     
     }
   });
   
 });
 
 app.get('/single',(req,res)=>{
-  res.render('single.hbs');
+  var room_id=req.query.roomId;
+  var src=req.query.src;
+  var wishlist_id=req.query.wishlist_id
+    if(src=='search' && room_id!=null)
+    Search.find({'room_id':room_id,'status':1,},(err,docs)=>{
+      res.render('single.hbs',{output:docs});
+    });
+    if(src=='wishlist' && wishlist_id!=null){
+      var flag=false;
+      Wishlist.findOne({'wishlist_id':wishlist_id},(err,doc)=>{
+        var room_id=doc.room_id;
+        var noOfPersons=doc.numberOfPeople;
+        var check_in=doc.check_in;
+        var check_out=doc.check_out;
+        Search.findOne({'room_id':room_id,'max_occupancy':{$gte:noOfPersons}},(err,result)=>{
+          if(result.length>0){
+            flag=true;
+          }
+        });
+      });
+    }
+  
 });
 
 
@@ -271,6 +326,23 @@ app.get('/single',(req,res)=>{
 
 
 //admin pages go down from here
+app.get('/wishlists',(req,res)=>{
+  var room_delete=req.query.delete;
+  var room_id=req.query.room_id;
+  var user_id=2;
+  if(room_delete==1){
+    Wishlist.findOneAndDelete({'room_id':room_id,"user_id":user_id},(err,resul)=>{
+      res.redirect('/wishlists');
+     // res.end();
+    })
+  }
+  if(room_delete!=1){
+  Wishlist.find({'user_id':user_id,'status':1},(err,docs)=>{
+    
+    res.render('wishlist.hbs',{name:'pavan',docs,len:docs.length});
+  });
+}
+});
 app.get('/manageHotel',(req,res)=>{
 var deleteRoom=req.query.deleteId;
 MongoClient.connect(url,function(err,db){
@@ -340,27 +412,38 @@ app.get('/roomInfo',(req,res)=>{
   var page=req.query.page;
   var search=req.query.search;
   var featurenames=[];
-  //console.log(hotelId);
+  var start=page*5-5;
+  var end=page*5;
+  
   if(search=='search' && hotelId!=null){
+ 
     Search.find({'hotel_id':hotelId,'status':1},(err,result)=>{
-      if(err) console.log('error');      
-        res.status(200).render('roomInfo.hbs',{result:result});
-    });
+      
+        if(err) console.log('error');   
+        var count=result.length;
+        var noOfPages=Math.ceil(count/5);
+        res.statusCode=200;
+        previous=parseInt(page)-1;
+        next=parseInt(page)+1;
+        if(result!=null){
+          console.log(typeof(hotelId));
+          res.render('roomInfo.hbs',{'result':result,'hotelId':hotelId,'noOfPages':noOfPages,'previous':previous,'next':next});
+        }
+    }).limit(end).skip(start);
   }
-  if(hotelId==null){
+  if(hotelId==null && search!='search'){
   Hotel.find({'status':1},(err,docs)=>{
     app.locals.cities=docs;
     if(err) console.log('error');  
     res.setHeader('Content-Type','text/html');
-    res.status(401).render('roomInfo.hbs',{output:docs});
+    res.render('roomInfo.hbs',{output:docs});
        
-  });}else{
+  });}
+  if(hotelId!=null && search!='search'){
   Hotel.findOne({'hotel_id':hotelId},(err,docs1)=>{
     if(err) console.log('error');
-    res.status(200).render('roomInfo.hbs',{id:hotelId,cityname:docs1.city,output:app.locals.cities});
+    res.render('roomInfo.hbs',{id:hotelId,cityname:docs1.city,output:app.locals.cities});
     
-  }).catch((e)=>{
-    if(e) throw e;
   });}
 
 
@@ -482,52 +565,52 @@ app.get('/roomDelete',(req,res)=>{
   });
 });
 function bothfeatures(feature_id,hotel_id,occupancy,check_in,check_out,room_type,limit,callback){
-  MongoClient.connect(url,{useNewUrlParser:true},function(err,db){
-    if(err) throw err;
-    var dbo=db.db("hotel_reservation");
-  dbo.collection("searches").find({'feature_id':feature_id,'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1,'room_type':room_type}
-    ).limit(limit).toArray((e,result)=>{
-        if(e) throw e;
-        db.close();
-        callback(result);
-});
-  });
+Search.find({'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'room_type':room_type},(err,result)=>{
+  if(result.check_in==null && result.check_out==null){
+    
+    callback(result);
+    }else{
+      
+      callback([]);
+    }
+}).limit(limit);
 };
 function filters(hotel_id,occupancy,check_in,check_out,room_type,limit,callback){
-  MongoClient.connect(url,{useNewUrlParser:true},function(err,db){
-    if(err) throw err;
-    var dbo=db.db("hotel_reservation");
-    dbo.collection("searches").find({'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1,'room_type':room_type}
-      ).limit(limit).toArray((e,result)=>{
-      if(e) throw e;
-      db.close();
-      callback(result);
-});
-  });
+    Search.find({'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'room_type':room_type},(err,result)=>{
+      if(!result.check_in && !result.check_out){
+    
+        callback(result);
+        }else{
+          
+          callback([]);
+        }
+    }
+      ).limit(limit);
 };
 function features(feature_id,hotel_id,occupancy,check_in,check_out,limit,callback){
-  MongoClient.connect(url,{useNewUrlParser:true},function(err,db){
-    if(err) throw err;
-    var dbo=db.db("hotel_reservation");
-    dbo.collection("searches").find({'feature_id':feature_id,'hotel_id':hotel_id,'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,'status':1}
-      ).limit(limit).toArray((e,result)=>{
-      if(e) throw e;
-      db.close();
-      callback(result);
-});});
+  console.log(feature_id);
+    Search.find({'feature_id':feature_id,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'status':1},(err,result)=>{
+     
+        if(!result.check_in && !result.check_out){
+          console.log('entered');
+        callback(result); 
+        }
+    }
+      ).limit(limit);
 };
 
 function nofeatures(hotel_id,occupancy,check_in,check_out,limit,callback){
-  MongoClient.connect(url,{useNewUrlParser:true},function(err,db){
-    if(err) throw err;
-    var dbo=db.db("hotel_reservation");
-    dbo.collection("searches").find({'hotel_id':hotel_id,'status':1}).limit(limit).toArray((e,result)=>{
-      //'max_occupancy':occupancy,'check_in':check_in,'check_out':check_out,
-      if(e) throw e;
-      db.close();
-      console.log('nofeautres',result);
-      callback(result);
-});});
+  var count=parseInt(occupancy);
+ 
+  Search.find({'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:count}},(err,result)=>{
+    if(result.check_in==null && result.check_out==null){
+    
+    callback(result);
+    }else{
+      
+      callback([]);
+    }
+  }).limit(limit);
 };
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);

@@ -1,6 +1,9 @@
 const mongoose=require('mongoose');
 var  WishlistSchema= new mongoose.Schema({
-   
+    wishlist_id:{
+        type:Number,
+        required:true,       
+    },
     room_id:{
         type:Number,
         required:true,
@@ -20,6 +23,26 @@ var  WishlistSchema= new mongoose.Schema({
     },
     numberOfPeople:{
         type:Number,
+        required:true
+    },
+    price:{
+        type:Number,
+        required:true
+    },
+    room_type:{
+        type:String,
+        required:true
+    },
+    image_url:{
+        type:String
+        
+    },
+    status:{
+        type:Number,
+        required:true
+    },
+    room_desc:{
+        type:String,
         required:true
     }
    

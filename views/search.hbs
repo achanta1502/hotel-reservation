@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
 <title>Comet Inn a Hotel Category Flat Bootstrap Responsive Website Template | Search :: PHP</title>
@@ -32,7 +33,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 </head>
 <body>
 <!--search-->
-{{{output}}}
+{{> menu}}
 <div class="search-page">
 	<div class="container">	
 		<div class="search-grids">
@@ -100,8 +101,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 												</div>
 												<div class="rating text-left">
 														<h5><b>Available Features</b></h5>	
-													{{#each output2}}
-															{{feature_name}}
+													{{#each feature_name}}
+															{{this}}
 													{{/each}}
 												</div>
 											</div>

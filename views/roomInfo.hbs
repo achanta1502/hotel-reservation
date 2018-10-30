@@ -85,8 +85,8 @@
                             
                             <nav>
                                 <ul class="pagination pagination-lg">
-{{!--                                 
-                                <?php
+                              
+                                {{!-- <?php
                                 $currentPage = $_GET["page"];
                                 $city = $_GET["city"];
                                 $start = $currentPage*5 - 5;
@@ -97,22 +97,17 @@
                                 $noOfPages = ceil(count($rows)/5);
                                 $i = 0;
                                 ?> --}}
-                                {{#each 10}}
-                                <p>count here{{this}}</p>
-                                {{/each}}
-                                <li><a href="/roomInfo?search=search&city=<?php echo $city ?>&page=<?php echo $currentPage - 1 ?>" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+                                <li><a href="/roomInfo?search=search&city={{hotelId}}&page={{previous}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
                                
-                                <?php
-                                while($i < $noOfPages){?>
-                                    <li><a href="roomInfo.php?search=search&city=<?php echo $city ?>?page=<?php echo $i+1 ?>"><?php echo $i+1 ?></a></li>
-                                    <?php
-                                    $i++;
-                                }?>
-                                <li><a href="roomInfo.php?search=search&city=<?php echo $city ?>?page=<?php echo $currentPage + 1 ?>" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+                               
+                               {{#times noOfPages}}
+                                    <li><a href="/roomInfo?city={{hotelId}}&search=search&page={{this}}">{{id}}</a></li>
+                                    {{/times}}
+                                <li><a href="/roomInfo?city={{hotelId}}&search=search&page={{next}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
                                 </ul>
                             </nav>
-                            {{!-- <?php --}}
-                    {{!-- }catch(PDOException $ex){
+                            {{!-- <?php
+                    }catch(PDOException $ex){
                         echo $ex->getMessage(); 
                     }
                 }
