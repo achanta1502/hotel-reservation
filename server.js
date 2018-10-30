@@ -297,27 +297,39 @@ app.get('/wishlist',(req,res)=>{
 });
 
 app.get('/single',(req,res)=>{
-  var room_id=req.query.roomId;
+  var room_id=req.query.room_id;
   var src=req.query.src;
-  var wishlist_id=req.query.wishlist_id
-    if(src=='search' && room_id!=null)
-    Search.find({'room_id':room_id,'status':1,},(err,docs)=>{
-      res.render('single.hbs',{output:docs});
+  console.log(room_id,src);
+  var wishlist_id=req.query.wishlist_id;
+    if(src=='search' && room_id!=null){
+    Search.findOne({'room_id':room_id,'status':1,},(err,docs)=>{
+      var room_type=docs.room_type;
+      var max_occupancy=docs.max_occupancy;
+      var check_in=app.locals.obj2.check_in;
+      var check_out=app.locals.obj2.check_out;
+      var image_url=docs.image_url;
+      var feature_name=docs.feature_name;
+      var price=parseInt(docs.price);
+      var serviceCharge=price*0.15;
+      var amountFinal=price+serviceCharge;
+      res.render('single.hbs',{room_id,room_type,max_occupancy,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal});
     });
-    if(src=='wishlist' && wishlist_id!=null){
-      var flag=false;
-      Wishlist.findOne({'wishlist_id':wishlist_id},(err,doc)=>{
-        var room_id=doc.room_id;
-        var noOfPersons=doc.numberOfPeople;
-        var check_in=doc.check_in;
-        var check_out=doc.check_out;
-        Search.findOne({'room_id':room_id,'max_occupancy':{$gte:noOfPersons}},(err,result)=>{
-          if(result.length>0){
-            flag=true;
-          }
-        });
-      });
-    }
+  }
+    // if(src=='wishlist' && wishlist_id!=null){
+    //   var flag=false;
+    //   Wishlist.findOne({'wishlist_id':wishlist_id},(err,doc)=>{
+    //     var room_id=doc.room_id;
+    //     var noOfPersons=doc.numberOfPeople;
+    //     var check_in=doc.check_in;
+    //     var check_out=doc.check_out;
+    //     Search.findOne({'room_id':room_id,'max_occupancy':{$gte:noOfPersons}},(err,result)=>{
+    //       if(result.length>0){
+    //         flag=true;
+    //         res.render('single.hbs',{output:docs,len:0,flag});
+    //       }
+    //     });
+    //   });
+    // }
   
 });
 
