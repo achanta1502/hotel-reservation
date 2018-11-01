@@ -65,14 +65,14 @@ if($_GET["src"] === "wishlist"){
 					<input type="hidden" name="roomId" value="{{room_id}}"/>
 					<h2><span class="glyphicon glyphicon-bed" aria-hidden="true"></span>{{room_type}}</h2>
 					<p><b>Max Occupancy:</b> {{max_occupancy}}</p>
+					{{#if len}}
 					<span class="margin-10"><b>Booking from:</b> {{check_in}}
 					<b>Booking to:</b>{{check_out}}</span>
-					{{!--  --}}
+					 
 					{{!-- <?php }
 					else if($_GET["src"] === "wishlist"){
 					?> --}}
-					{{!--  --}}
-					{{!-- 
+					{{else}}
 					<div class="sf-dates margin-10">
 						<table class="table-singlepage">
 							<tr>
@@ -80,7 +80,8 @@ if($_GET["src"] === "wishlist"){
 									<label for="checkin" class="margin-10"> Check-in : </label><br/>
 								</td>
 								<td>
-									<input type="text" id="checkin" name ="check_in" value="{{check_in}}" class="margin-10"/>
+									{{check_in}}
+									{{!-- <input type="date" id="checkin" name ="check_in" value="{{check_in}}" class="margin-10"/> --}}
 								</td>
 							</tr>
 							<tr>
@@ -88,7 +89,8 @@ if($_GET["src"] === "wishlist"){
 									<label for="checkout" class="margin-10"> Check-out : </label>
 								</td>
 								<td>
-									<input type="text" id="checkout" name ="check_out"  value="{{check-out}}" class="margin-10"/><br/>
+									{{check_out}}
+									{{!-- <input type="date" id="checkout" name ="check_out"  value="{{check_out}}" class="margin-10"/><br/> --}}
 								</td>
 							</tr>
 							<tr>
@@ -96,7 +98,7 @@ if($_GET["src"] === "wishlist"){
 									<label for="noOfPersons" class="margin-10"> # of People : </label>
 								</td>
 								<td>
-									<input type="number" style="width:20%" name ="noOfPersons"  value="{{numberOfPeople}}" class="margin-10"/>
+									<input type="number" style="width:20%" name ="noOfPersons"  value="{{noOfPersons}}" class="margin-10"/>
 								</td>
 							</tr>
 							<tr>
@@ -104,7 +106,7 @@ if($_GET["src"] === "wishlist"){
 									<label for="availStatus" class="margin-10"> Availability : </label>
 								</td>
 								<td>
-									<p name="availStatus" class="<?php if($status) echo 'green'; else echo 'red';?>">
+									<p name="availStatus" class="green">
 									{{!-- <?php if($status) echo 'Available'; else echo 'Try other dates';?> --}}
 									{{#if flag}} <p>Available</p{{else}}><p>Try other Dates</p>{{/if}}
 									</p>
@@ -113,10 +115,10 @@ if($_GET["src"] === "wishlist"){
 						</table>
 					</div>
 					{{!-- <?php } ?> --}}
+					{{/if}}
+					 
 					
-					 --}}
-					{{!--  --}}
-					<img src="{{image_url}}" alt="" width="90%" height="50%" style="margin-top:10px"/>
+					<img src="{{image_url}}" alt="" width="60%" height="35%" style="margin-top:10px"/>
 				</div>
 				</div>
 				<div class="col-md-4 single-gd-rt">
@@ -127,9 +129,9 @@ if($_GET["src"] === "wishlist"){
 						<div class="sp-bor-btn text-right">
 							<h4 name="price">${{price}}</h4>
 							<p class="best-pri">Best price</p>
-							<p class="best-pri"><b style="margin-right: 20px;">Service Charge(15%):</b>&nbsp;{{serviceCharge}}</p>
+							<p class="best-pri"><b style="margin-right: 20px;">Service Charge(8%):</b>&nbsp;{{serviceCharge}}</p>
 							<p class="best-pri"><b style="margin-right: 12px;">Total Price:</b>&nbsp;${{amountFinal}}</p>
-							<input type="hidden" value="{{price}}" name="amountPaid"/>
+							<input type="hidden" value="{{amountFinal}}" name="amountPaid"/>
 							{{!-- <?php $amountfinal =  $rooms[0]["price"]+$rooms[0]["price"]*.15 ?> --}}
 							<div class="search">
 								<input type="submit" name="booknow" value="Book Now" />
@@ -148,15 +150,15 @@ if($_GET["src"] === "wishlist"){
 						<div class="sp-bor-btn text-left">
 							{{!-- <?php if (count($featuresSelected) > 0){ ?>
 							<?php for($i=0; $i< count($featuresSelected); $i++){?> --}}
-							{{!--  --}}
+							
 							{{#each feature_name}}
 							<p class="best-pri">{{this}}</p>
 							{{/each}}
-							{{!-- <?php }}else{?> --}}
-							{{!--  --}}
-								{{!-- <p class="best-pri">No Features yet!!!</p> --}}
-							{{!-- <?php } ?> --}}
-							{{!-- { --}}
+							{{!-- <?php }}else{?>
+							
+								<p class="best-pri">No Features yet!!!</p>
+							 <?php } ?> --}}
+							
 						</div>
 					</div>
 					

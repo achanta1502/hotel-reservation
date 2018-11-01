@@ -14,6 +14,7 @@ const session=require('express-session');
 const {Hotel}=require('./models/hotel');
 const {User}=require('./models/user');
 const {Room}=require('./models/room');
+const {Booking}=require('./models/booking');
 const {Search}=require('./models/search');
 const {Wishlist}=require('./models/wishlist');
 const {Feature}=require('./models/feature');
@@ -227,17 +228,19 @@ var limit=end-start;
 //   });
 // }else 
 if(name_filter_flag){
+  console.log('name_filter',name_filter);
 filters(hotel_id,noOfPersons,check_in,check_out,name_filter,limit,(result2)=>{
-  res.render('search.hbs',{output:result2});
+  console.log(result2);
+  res.render('search.hbs',{output:result2,len:result2.length});
 });
 }else if(feature_id){
   features(feature_id,hotel_id,noOfPersons,check_in,check_out,limit,(result3)=>{
-    res.render('search.hbs',{output:result3});
+    res.render('search.hbs',{output:result3,len:result3.length});
   });
 }else{
   console.log('no features');
   nofeatures(hotel_id,noOfPersons,check_in,check_out,limit,(result4)=>{
-    res.render('search.hbs',{output:result4});
+    res.render('search.hbs',{output:result4,len:result4.length});
   });
 }
 
@@ -252,7 +255,7 @@ app.get('/wishlist',(req,res)=>{
     if(result!=null && result.room_id==room_id){
     var aler="<script type='text/javascript'>alert('Room already exists in your wishlist!');</script>";
     console.log('already exist',result.room_id);
-   res.status(200).render('search.hbs',{output:aler});
+   res.status(200).render('search.hbs',{aler:aler});
       
     }else{
       console.log(room_id,user_id);
@@ -280,7 +283,7 @@ app.get('/wishlist',(req,res)=>{
         var wishlist=new Wishlist(obj);
         wishlist.save().then(()=>{
           var aler="<script type='text/javascript'>alert('New room added to wishlist');</script>";
-              res.status(200).render('search.hbs',{output:aler});
+              res.status(200).render('search.hbs',{aler:aler});
         }).catch((err)=>{
           console.log(err);
         });
@@ -299,7 +302,6 @@ app.get('/wishlist',(req,res)=>{
 app.get('/single',(req,res)=>{
   var room_id=req.query.room_id;
   var src=req.query.src;
-  console.log(room_id,src);
   var wishlist_id=req.query.wishlist_id;
     if(src=='search' && room_id!=null){
     Search.findOne({'room_id':room_id,'status':1,},(err,docs)=>{
@@ -309,31 +311,119 @@ app.get('/single',(req,res)=>{
       var check_out=app.locals.obj2.check_out;
       var image_url=docs.image_url;
       var feature_name=docs.feature_name;
-      var price=parseInt(docs.price);
-      var serviceCharge=price*0.15;
+      var costcount=Math.abs(Date.parse(check_in)-Date.parse(check_out))/86400000;
+      var price=costcount*parseInt(docs.price);
+      var serviceCharge=Math.round(price*0.15);
       var amountFinal=price+serviceCharge;
-      res.render('single.hbs',{room_id,room_type,max_occupancy,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal});
+      res.render('single.hbs',{room_id,room_type,max_occupancy,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal,len:1});
     });
   }
-    // if(src=='wishlist' && wishlist_id!=null){
-    //   var flag=false;
-    //   Wishlist.findOne({'wishlist_id':wishlist_id},(err,doc)=>{
-    //     var room_id=doc.room_id;
-    //     var noOfPersons=doc.numberOfPeople;
-    //     var check_in=doc.check_in;
-    //     var check_out=doc.check_out;
-    //     Search.findOne({'room_id':room_id,'max_occupancy':{$gte:noOfPersons}},(err,result)=>{
-    //       if(result.length>0){
-    //         flag=true;
-    //         res.render('single.hbs',{output:docs,len:0,flag});
-    //       }
-    //     });
-    //   });
-    // }
+    if(src=='wishlist' && wishlist_id!=null){
+      var flag=0;
+      Wishlist.findOne({'wishlist_id':wishlist_id},(err,doc)=>{
+        if(err) throw err;
+        var room_id=doc.room_id;
+        var noOfPersons=doc.numberOfPeople;
+        var check_in=doc.check_in;     
+        var check_out=doc.check_out;
+        console.log(check_in,check_out);
+        Search.findOne({'room_id':room_id,'status':1},(err,result)=>{
+          if(err) throw err;
+          if(result!=null){
+            flag=1;
+            var max_occupancy=result.max_occupancy;
+            var room_type=result.room_type;        
+            var image_url=result.image_url;
+            var feature_name=result.feature_name;
+            var costcount=Math.abs(Date.parse(check_in)-Date.parse(check_out))/86400000;
+            var price=costcount*parseInt(result.price);
+            var serviceCharge=Math.round(price*0.15);
+            var amountFinal=price+serviceCharge;
+           
+           //console.log(checkin);
+            res.render('single.hbs',{room_id,room_type,max_occupancy,noOfPersons,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal,len:0,flag});
+          }
+        });
+      });
+    }
   
 });
 
+app.post('/single',(req,res)=>{
+var src=req.query.src;
 
+var amount_paid=req.body.amountPaid;
+var user_id=req.session.sess_userid;
+var wishlist_id=req.query.wishlist_id;
+if(src=='wishlist'){
+var room_id=req.body.roomId;
+var check_in=req.body.check_in;
+var check_out=req.body.check_out;
+var noOfPersons=req.body.noOfPersons;
+console.log(check_in,check_out);
+Room.find({'room_id':room_id,'max_occupancy':{$gte:noOfPersons}},(err,docs)=>{
+  Booking.findOne({'room_id':room_id,$or:[{$and:[{'check_in':{$lte:new Date(check_in)}},{'check_out':{$gte:new Date(check_in)}}]},{$and:[{'check_in':{$lte:new Date(check_out)}},{'check_out':{$gte:new Date(check_out)}}]}]},(err,doc1)=>{
+
+    if(doc1==null){
+      Booking.findOne({},(err,doc)=>{
+        var booking_id;
+        if(doc==null){
+          booking_id=1;
+        }else{
+          booking_id=doc.booking_id+1;
+        }
+        
+        var obj={
+          booking_id,
+          user_id,
+          room_id,
+          amount_paid,
+          check_in,
+          check_out,
+          'status':1
+        };
+        var booking=new Booking(obj);
+        booking.save().then(()=>{
+          Wishlist.findOneAndDelete({'wishlist_id':wishlist_id},(err,result1)=>{
+            res.render('home.hbs');
+          });
+        });
+      }).sort({'booking_id':-1});
+    }else{
+      res.write("<script type='text/javascript'>alert('Try changing date or Number of People.');</script>");
+    }
+  }
+)
+});
+}
+if(src=='search'){
+  var room_id=req.query.room_id;
+  Booking.findOne({},(err,doc)=>{
+    var booking_id;
+    if(doc==null){
+      booking_id=1;
+    }else{
+      booking_id=doc.booking_id+1;
+    }
+    
+    var check_in=app.locals.obj2.check_in;
+    var check_out=app.locals.obj2.check_out;
+    var obj={
+      booking_id,
+      user_id,
+      room_id,
+      amount_paid,
+      check_in,
+      check_out,
+      'status':1
+    };
+    var booking=new Booking(obj);
+    booking.save().then(()=>{
+      res.render('booking.hbs',{});
+    });
+  }).sort({'booking_id':-1});
+}
+});
 
 
 
