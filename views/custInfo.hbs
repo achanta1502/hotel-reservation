@@ -1,0 +1,22 @@
+{{> menu}}
+
+<div class="search-page search-grid-full">
+<div class="booking">
+	<div class="container">
+			<div class="reservation-form">
+				<div class="col-md-9 reservation-right">
+					<form method="POST" action="/custInfo?id={{user_id}}" name="custInfo" class="edit">
+						<h4>Name</h4>         			
+                        <input type="text" name="name" value="{{name}}" placeholder="Name" required>
+						<h4>Email</h4>
+						<input type="text" name="email" value="{{email}}"  placeholder="Email" required>
+						<h4>Phone</h4>
+						<input type="text" name="phone" value="{{phone}}"  placeholder="Phone" required>
+						<input type="submit" name="submitted" class="btn1 btn-1 btn-1e" value="UPDATE NOW">
+					</form>
+				</div>
+			</div>
+	</div>
+</div>
+</div>
+{{> footer}}

@@ -62,9 +62,10 @@ $('#pwd2').blur('input', function() {
     $( this ).next( "p" ).hide();
     
 	var input=$(this);
-	var user_pass=input.val();
+    var user_pass=input.val();
+    var user_pass1=$('#pwd1').val();
 	var len = user_pass.length;
-	if(len >= 8 && len<=16){  
+	if(len >= 8 && len<=16 && user_pass==user_pass1){  
 		$( this ).next( "p" ).text(" ").append('<i style="display:inline;color: #3a7d34;">&#10004;</i>');
 		$( this ).next( "p" ).show();
 		}

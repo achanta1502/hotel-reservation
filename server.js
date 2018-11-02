@@ -788,6 +788,21 @@ if(deleteId){
   });
 }
 });
+app.get('/custInfo',(req,res)=>{
+  var user_id=req.query.id;
+  User.findOne({user_id},(err,result)=>{
+    res.render('custInfo',result);
+  });
+});
+app.post('/custInfo',(req,res)=>{
+  var user_id=req.query.id;
+  User.findOneAndUpdate({user_id:user_id},{$set:{'email':req.body.email,'name':req.body.name,'phone':req.body.phone}},(err,result)=>{
+    res.redirect('/usersList?page=1');
+  })
+});
+app.get('/forgotpassword',(req,res)=>{
+  res.render('forgotpassword.hbs');
+});
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
     
