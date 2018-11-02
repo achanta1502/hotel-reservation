@@ -87,7 +87,7 @@ app.get('/',(req,resp)=>{
   //to register into portal
  app.post('/register',(req,res)=>{
    var body=_.pick(req.body,['email','password','fname','phone']);
-  console.log(body);
+  
    if(!body.email || !body.fname || !body.password || !body.phone){
       res.status(401).render('register.hbs');}
     User.findOne({
@@ -111,7 +111,7 @@ app.get('/',(req,resp)=>{
                  }
                 let hash = bycrypt.hashSync(body.password, 10);
                 
-                console.log('password',hash);
+                
                 var obj={
                   'user_id':user_id,
                   'email':body.email,
@@ -774,80 +774,20 @@ app.get('/roomDelete',(req,res)=>{
     });
   });
 });
-function bothfeatures(feature_id,hotel_id,occupancy,check_in,check_out,room_type,skip,limit,callback){
-  Search.findOne({'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'room_type':room_type},(err,doc)=>{
-      if(doc.booking_id==null){
-        Search.find({'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'room_type':room_type},(err,result)=>{
-          if(result.check_in==null && result.check_out==null){
-            
-            callback(result);
-            }else{
-              
-              callback([]);
-            }
-        }).skip(skip).limit(limit);
-
-      }else{
-        Search.find({'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'room_type':room_type,$or:[{$and:[{'check_in':{$lte:new Date(check_in)}},{'check_out':{$gte:new Date(check_in)}}]},{$and:[{'check_in':{$lte:new Date(check_out)}},{'check_out':{$gte:new Date(check_out)}}]}]},(err,result)=>{
-          if(result.check_in==null && result.check_out==null){
-            
-            callback(result);
-            }else{
-              
-              callback([]);
-            }
-        }).skip(skip).limit(limit);
-      }
+app.get('/usersList',(req,res)=>{
+  var page=req.query.page;
+  var deleteId=req.query.deleteId;
+  if(!deleteId){
+  User.find({'user_id':{$gt:0},'status':1},(err,docs)=>{
+    res.render('usersList.hbs',{output:docs,page})
   });
-
-};
-function filters(hotel_id,occupancy,check_in,check_out,room_type,skip,limit,callback){
-    Search.find({'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'room_type':room_type,$or:[{$and:[{'check_in':{$lte:new Date(check_in)}},{'check_out':{$gte:new Date(check_in)}}]},{$and:[{'check_in':{$lte:new Date(check_out)}},{'check_out':{$gte:new Date(check_out)}}]}]},(err,result)=>{
-      if(!result.check_in && !result.check_out){
-    
-        callback(result);
-        }else{
-          
-          callback([]);
-        }
-    }
-      ).skip(skip).limit(limit);
-};
-function features(feature_id,hotel_id,occupancy,check_in,check_out,skip,limit,callback){
-  console.log(feature_id);
-    Search.find({'feature_id':feature_id,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},'status':1,$or:[{$and:[{'check_in':{$lte:new Date(check_in)}},{'check_out':{$gte:new Date(check_in)}}]},{$and:[{'check_in':{$lte:new Date(check_out)}},{'check_out':{$gte:new Date(check_out)}}]}]},(err,result)=>{
-     
-        if(!result.check_in && !result.check_out){
-          console.log('entered');
-        callback(result); 
-        }
-    }
-      ).skip(skip).limit(limit);
-};
-
-function nofeatures(hotel_id,occupancy,check_in,check_out,skip,limit,callback){
-  var count=parseInt(occupancy);
- 
-  Search.findOne({'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)}},(err,doc)=>{
-    console.log('bookindid',doc.booking_id);
-    if(doc.booking_id==null){
-      Search.find({'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)}},(err,result)=>{
-       
-          
-          callback(result);
-          
-      }).skip(skip).limit(limit);
-
-    }else{
-      Search.find({'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},$or:[{$and:[{'check_in':{$lte:new Date(check_in)}},{'check_out':{$gte:new Date(check_in)}}]},{$and:[{'check_in':{$lte:new Date(check_out)}},{'check_out':{$gte:new Date(check_out)}}]}]},(err,result)=>{
-        
-          
-          callback(result);
-          
-      }).skip(skip).limit(limit);
-    }
+}
+if(deleteId){
+  User.findOneAndDelete({'user_id':deleteId},{$set:{'status':0}},(err,doc)=>{
+    res.redirect('/usersList?page='+page+'');
+  });
+}
 });
-};
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
     
