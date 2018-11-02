@@ -43,6 +43,9 @@ type:String
     },
     price:{
         type:String
+    },
+    user_id:{
+        type:Number
     }
 });
 

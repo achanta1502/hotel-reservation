@@ -134,7 +134,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                 <nav>
 				  <ul class="pagination pagination-lg">
                     
-                    <?php
+                    {{!-- <?php
 					if(isset($_GET["page"])){
 						$currentPage = $_GET["page"];
 					}else{
@@ -194,15 +194,16 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 					$rows = $result->num_rows;
                     $noOfPages = ceil(count($rows)/5);
 					 $i = 0;
-                     ?>
-                     <li><a href="search.php?page=<?php echo $currentPage - 1 ?>" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
-                     <?php
-                     while($i <= $noOfPages){?>
-                        <li><a href="search.php?page=<?php echo $i+1 ?>"><?php echo $i+1 ?></a></li>
-                     <?php
+                     ?> --}}
+                     <li><a href="/search?page={{prevPage}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+                     {{!-- <?php --}}
+                     {{#times pageCount}}
+                        <li><a href="/search?page={{this}}">{{this}}</a></li>
+						{{/times}}
+                     {{!-- <?php
                         $i++;
-                    }?>
-					<li><a href="search.php?page=<?php echo $currentPage + 1 ?>" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+                    }?> --}}
+					<li><a href="/search?page={{nextPage}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
 				  </ul>
 				  </nav>
                 </div>
