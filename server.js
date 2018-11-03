@@ -803,6 +803,17 @@ app.post('/custInfo',(req,res)=>{
 app.get('/forgotpassword',(req,res)=>{
   res.render('forgotpassword.hbs');
 });
+app.post('/forgotpassword',(req,res)=>{
+  var email=req.body.email;
+  var pwd1=req.body.pwd1;
+  var pwd2=req.body.pwd2;
+  User.findOne({'email':email},(err,doc)=>{
+    if(doc==null){
+      var aler="<script type='text/javascript'>alert('email id doesn't exist);</script>";
+      res.render('forgotpassword.hbs',{'aler':aler});
+    }
+  });
+});
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);
     
