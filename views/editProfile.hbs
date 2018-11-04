@@ -1,12 +1,12 @@
 <div class="banner1">
-<?php include 'menu.php';
-require_once('config.php');
+{{> menu}}
+{{!-- require_once('config.php');
 session_start();
 if(!isset($_SESSION["sess_userid"])){
 	echo '<script type="text/javascript">location.href = "index.php";</script>';
 	echo '<script type="text/javascript">alert("please login");</script>';	
 }
-?>
+?> --}}
 
 <!DOCTYPE html>
 <html>
@@ -70,41 +70,22 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 		</div>
 		<div class="banner-bottom1">
 				<h3 class="tittle"> Edit profile </h2>
-    <?php
-    $con=mysqli_connect(DBHOST, DBUSER, DBPASS, DBNAME);
-    if(mysqli_connect_errno())
-    {
-        echo "Failed to connect to MySQL: " . mysqli_connect_error();
-        exit();
-    }
-    $userid = $_SESSION["sess_userid"];
-    $query = "SELECT * FROM `user` WHERE user_id = '$userid'";
-    $result = mysqli_query($con,$query);
-    $row = mysqli_fetch_array($result);
-    if(mysqli_num_rows($result)>0 && $row['user_id']==$userid)
-    {
-        $name = $row['name'];
-        $phone = $row['phone'];
-        $email = $row['email_id'];
-       
-    }
-    
-    ?>
-	<form method="POST" action="editProfile.php" name="edit">
+  
+	<form method="POST" action="/editProfile" name="edit">
     
     <table class="spacing-table">
     <tr>
 	<td>Email ID:</td>
-    <td> <input type="email" name="email" id="email" value="<?php echo $email; ?>" /></td>
+    <td> <input type="email" name="email" id="email" value="{{email}}" disabled="disabled" /></td>
     </tr>
    
     <tr>
 	<td>Full Name:</td>
-    <td><input type="text" name="fname" id="fname" value="<?php echo $name; ?>" /></td>
+    <td><input type="text" name="fname" id="fname" value="{{name}}" /></td>
     </tr>
     <tr>
     <td>Phone Number:</td>
-    <td><input type="number" name="phone" id="phone" value="<?php echo $phone; ?>" /></td>
+    <td><input type="number" name="phone" id="phone" value="{{phone}}" /></td>
     </tr>
     <tr>
     <td></td>
@@ -190,38 +171,4 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 </body>
 </html>
 
-	<?php
 	
-	if(isset($_POST['edit']))
-	{	
-		Edit();
-	}
-	function Edit()
-	{
-          
-		$con=mysqli_connect(DBHOST, DBUSER, DBPASS, DBNAME);
-		if(mysqli_connect_errno())
-    {
-        echo "Failed to connect to MySQL: " . mysqli_connect_error();
-        exit();
-    }
-	    
-	$new_name = $_POST["fname"];
-	$new_email = $_POST["email"];
-    $new_phone = $_POST["phone"];
-    $userid = $_SESSION['sess_userid'];
-    $update = "UPDATE `user` SET name='$new_name', email_id='$new_email', phone='$new_phone'
-                    WHERE user_id=$userid";
-    if($con->query($update)===TRUE)
-    {
-        unset($_POST);                
-        header("Location:home.php");
-    }
-    else
-    {        
-        unset($_POST);
-        echo "<script type='text/javascript'>alert('Unable to edit profile. Please try again.');</script>";
-    }
-
-	}
-	?>

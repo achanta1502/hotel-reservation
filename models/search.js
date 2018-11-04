@@ -46,6 +46,9 @@ type:String
     },
     user_id:{
         type:Number
+    },
+    amount_paid:{
+        type:String
     }
 });
 

@@ -31,10 +31,13 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 			});
 		</script>
 	<!-- start-smoth-scrolling -->
+
 </head>
+
 <body>
 <!--search-->
 {{{aler}}}
+
 <div class="search-page">
 	<div class="container">	
 		<div class="search-grids">
@@ -195,15 +198,15 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     $noOfPages = ceil(count($rows)/5);
 					 $i = 0;
                      ?> --}}
-                     <li><a href="/search?page={{prevPage}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+                     <li><a href="/search?page={{prevPage}}{{#if feature}}&feature={{feature}}{{/if}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
                      {{!-- <?php --}}
                      {{#times pageCount}}
-                        <li><a href="/search?page={{this}}">{{this}}</a></li>
+                        <li><a href="/search?page={{this}}{{#if feature}}&feature={{feature}}{{/if}}">{{this}}</a></li>
 						{{/times}}
                      {{!-- <?php
                         $i++;
                     }?> --}}
-					<li><a href="/search?page={{nextPage}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+					<li><a href="/search?page={{nextPage}}{{#if feature}}&feature={{feature}}{{/if}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
 				  </ul>
 				  </nav>
                 </div>

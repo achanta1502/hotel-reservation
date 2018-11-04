@@ -296,7 +296,7 @@ ul.social-slide li i.mac{
   width: 80px;
   height: 7px;
   display:inline-block;
-  background: #fff;
+  background: grey;
 }
 .callbacks_here a:after{
 	background: #F896A9;	
@@ -352,7 +352,7 @@ min-height: 855px;
  font-family: 'Alegreya-Regular';
   text-decoration: none;
 	padding: 0 0 6px 0;
-	color:#fff;
+		color:grey;
 	text-shadow: none;
 } 
 
@@ -363,7 +363,7 @@ min-height: 855px;
 	overflow: hidden;
 	padding: 0 0 6px 0;
 	max-width: 0;
-	border-bottom: 2px solid #fff;
+	border-bottom: 2px solid grey;
 	color: #DF1E1C;
 	content: attr(data-hover);
 	-webkit-transition: max-width 0.5s;
@@ -1405,7 +1405,7 @@ text-decoration:none;
 }
 
 .ch-img-1 { 
-	background-image: url(../images/pratyusha.jpg);
+	background-image: url();
   border-radius: 50%;
   -webkit-border-radius: 50%;
   -o-border-radius: 50%;
