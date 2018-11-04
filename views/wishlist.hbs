@@ -159,6 +159,19 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                                 {{else}}
                                 <p>"WishList is empty!Try adding few rooms as your favourites"</p>
                                 {{/if}}
+                <div>
+                <nav>
+				  <ul class="pagination pagination-lg">
+                     <li><a href="/wishlists?page={{prevPage}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+                     
+                     {{#times pageCount}}
+                        <li><a href="/wishlists?page={{this}}">{{this}}</a></li>
+						{{/times}}
+                     
+					<li><a href="/wishlists?page={{nextPage}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+				  </ul>
+				  </nav>
+                </div>
                                   
         </div>
 </div>

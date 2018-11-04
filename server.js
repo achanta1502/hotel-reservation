@@ -613,20 +613,26 @@ pages=Math.ceil(docs.length/2);
 
 //admin pages go down from heres
 app.get('/wishlists',(req,res)=>{
+  var pagenumber=parseInt(req.query.page);
+var start=pagenumber*2-2;
+var end=pagenumber*2;
+var skip=start;
+var limit=end-start;
+var pageCount;
   var room_delete=req.query.delete;
   var room_id=req.query.room_id;
-  var user_id=2;
+  var user_id=req.session.sess_userid;
   if(room_delete==1){
     Wishlist.findOneAndDelete({'room_id':room_id,"user_id":user_id},(err,resul)=>{
-      res.redirect('/wishlists');
+      res.redirect('/wishlists?page=1');
      // res.end();
     })
   }
   if(room_delete!=1){
-  Wishlist.find({'user_id':user_id,'status':1},(err,docs)=>{
-    
-    res.render('wishlist.hbs',{name:'pavan',docs,len:docs.length});
-  });
+  Wishlist.find({'user_id':user_id,'status':1},(err,docs)=>{ 
+    pageCount=Math.ceil(docs.length/2)+1;
+    res.render('wishlist.hbs',{name:'pavan',docs,len:docs.length,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1});
+  }).skip(skip).limit(limit);
 }
 });
 app.get('/manageHotel',(req,res)=>{
@@ -862,12 +868,18 @@ app.get('/roomDelete',(req,res)=>{
   });
 });
 app.get('/usersList',(req,res)=>{
-  var page=req.query.page;
+  var pagenumber=parseInt(req.query.page);
   var deleteId=req.query.deleteId;
+  var start=pagenumber*5-5;
+var end=pagenumber*5;
+var skip=start;
+var limit=end-start;
+var pageCount;
   if(!deleteId){
   User.find({'user_id':{$gt:0},'status':1},(err,docs)=>{
-    res.render('usersList.hbs',{output:docs,page})
-  });
+    pageCount=Math.ceil(docs.length/5)+1;
+    res.render('usersList.hbs',{output:docs,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1})
+  }).skip(skip).limit(limit);
 }
 if(deleteId){
   User.findOneAndDelete({'user_id':deleteId},{$set:{'status':0}},(err,doc)=>{

@@ -136,76 +136,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 				<div>
                 <nav>
 				  <ul class="pagination pagination-lg">
-                    
-                    {{!-- <?php
-					if(isset($_GET["page"])){
-						$currentPage = $_GET["page"];
-					}else{
-						$currentPage = 1;
-					}
-					
-					if(isset($_POST['name_filter']) && $_POST['filter_text']!="Hotel name..."){
-						$name_filter = $_POST['filter_text'];
-						$name_filter_flag = true;
-					}else{
-						$name_filter_flag = false;
-					}
-
-					if($name_filter_flag && isset($_GET["feature"]))
-					{		
-						$feature_id = $_GET["feature"];		
-						$query = 
-							"SELECT * from room r
-							join room_features f1
-							on r.room_id = f1.room_id and f1.feature_id='$feature_id'
-							where hotel_id='$hotel_id' and max_occupancy >= $occupancy  and r.status =1 and r.room_id NOT IN 
-							(select b.room_id from bookings b
-							where r.room_id = b.room_id and 
-							(('$check_in' >= b.checkin and '$check_in' <= b.checkout ) or 
-							('$check_out' >= b.checkin and '$check_out' <= b.checkout )))
-							and r.room_type like '%$name_filter%'";						
-					}else if($name_filter_flag){
-						$query = 
-							"SELECT * from room r
-							where hotel_id='$hotel_id' and max_occupancy >= $occupancy  and r.status =1 and r.room_id NOT IN 
-							(select b.room_id from bookings b
-							where r.room_id = b.room_id and 
-							(('$check_in' >= b.checkin and '$check_in' <= b.checkout ) or 
-							('$check_out' >= b.checkin and '$check_out' <= b.checkout )))
-							and r.room_type like '%$name_filter%'";	
-					}else if(isset($_GET["feature"])){
-						$feature_id = $_GET["feature"];
-						$query = "SELECT * from room r 
-							join room_features f1
-							on r.room_id = f1.room_id and f1.feature_id='$feature_id'
-							where hotel_id='$hotel_id' and r.max_occupancy >= $occupancy  and r.status =1 and r.room_id NOT IN 
-							(select b.room_id from bookings b
-							where r.room_id = b.room_id and 
-							(('$check_in' >= b.checkin and '$check_in' <= b.checkout ) or 
-							('$check_out' >= b.checkin and '$check_out' <= b.checkout )));";
-					}else{
-						$query = "SELECT * from room r
-						where hotel_id='$hotel_id' and r.max_occupancy >= $occupancy  and r.status =1 and r.room_id NOT IN 
-						(select b.room_id from bookings b
-						where r.room_id = b.room_id and 
-						(('$check_in' >= b.checkin and '$check_in' <= b.checkout ) or 
-						('$check_out' >= b.checkin and '$check_out' <= b.checkout )));";
-					}
-                   
-                    $result = $db->query($query);
-					// Do we have any results?
-					$rows = $result->num_rows;
-                    $noOfPages = ceil(count($rows)/5);
-					 $i = 0;
-                     ?> --}}
                      <li><a href="/search?page={{prevPage}}{{#if feature}}&feature={{feature}}{{/if}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
-                     {{!-- <?php --}}
+                     
                      {{#times pageCount}}
                         <li><a href="/search?page={{this}}{{#if feature}}&feature={{feature}}{{/if}}">{{this}}</a></li>
 						{{/times}}
-                     {{!-- <?php
-                        $i++;
-                    }?> --}}
+                     
 					<li><a href="/search?page={{nextPage}}{{#if feature}}&feature={{feature}}{{/if}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
 				  </ul>
 				  </nav>
@@ -213,6 +149,5 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 		</div>
 	</div>
 </div>
-<!--//search-->
-<!--footer-->
+
 {{> footer}}

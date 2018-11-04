@@ -66,24 +66,13 @@ if(!isset($_SESSION["sess_userid"])){
                 <div>
                 <nav>
 				  <ul class="pagination pagination-lg">
-{{!--                     
-                    <?php
-                    $currentPage = $_GET["page"];
-                    $query = $db->prepare("SELECT * FROM user where user_id > 1 and status=1");
-                    $query->execute();
-                    $rows=$query->fetchAll();
-                    
-                     $noOfPages = ceil(count($rows)/5);
-                     $i = 0;
-                     ?> --}}
-                     <li><a href="usersList.php?page=<?php echo $currentPage - 1 ?>" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
-                     {{!-- <?php
-                     while($i < $noOfPages){?> --}}
-                        <li><a href="usersList.php?page=<?php echo $i+1 ?>"></a></li>
-                     {{!-- <?php
-                        $i++;
-                    }?> --}}
-					<li><a href="usersList.php?page=<?php echo $currentPage + 1 ?>" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+                     <li><a href="/usersList?page={{prevPage}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+                     
+                     {{#times pageCount}}
+                        <li><a href="/usersList?page={{this}}">{{this}}</a></li>
+						{{/times}}
+                     
+					<li><a href="/usersList?page={{nextPage}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
 				  </ul>
 				  </nav>
                 </div>
