@@ -72,6 +72,9 @@ app.get('/',(req,resp)=>{
   app.get('/addCity',(req,res)=>{
     res.status(200).render('addCity.hbs');
   });
+  app.get('/email',(req,res)=>{
+    res.json({'hello':'hi'});
+  });
   app.get('updateCity',(req,res)=>{
     res.render('updateCity.hbs');
   })
@@ -108,6 +111,7 @@ app.get('/',(req,resp)=>{
   
    if(!body.email || !body.fname || !body.password || !body.phone){
       res.status(401).render('register.hbs');}
+      else{
     User.findOne({
       'email':body.email
     },(err,result)=>{
@@ -152,6 +156,7 @@ app.get('/',(req,resp)=>{
       }
 
     });
+  }
  });
 
 // to login to the portal
@@ -878,12 +883,12 @@ var pageCount;
   if(!deleteId){
   User.find({'user_id':{$gt:0},'status':1},(err,docs)=>{
     pageCount=Math.ceil(docs.length/5)+1;
-    res.render('usersList.hbs',{output:docs,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1})
+    res.render('usersList.hbs',{output:docs,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1,'page':pagenumber})
   }).skip(skip).limit(limit);
 }
 if(deleteId){
   User.findOneAndDelete({'user_id':deleteId},{$set:{'status':0}},(err,doc)=>{
-    res.redirect('/usersList?page='+page+'');
+    res.redirect('/usersList?page=1');
   });
 }
 });
@@ -942,6 +947,12 @@ app.get('/logout',(req,res)=>{
     if(err) throw err;
     res.redirect('/');
   });
+});
+app.get('/validation',(req,res)=>{
+User.find({},{email:1},(err,docs)=>{
+  if(err) throw err;
+  res.json(docs);
+});
 });
 app.listen(port,()=>{
     console.log(`Server is up on port ${port}`);

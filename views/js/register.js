@@ -1,11 +1,14 @@
 $(document).ready(function() {
+	console.log('hello');
+	
 	$("#password").after("<p>The password should be at least 8 characters</p>");
 	$("#fname").after("<p>Name should have only letters</p>");
 	$("#email").after("<p>Please enter a valid email</p>");
 	$("#phone").after("<p>Please enter a valid phone number</p>");
 	$("p").hide();
 
-	$('#password').blur('input', function() {    	
+	$('#password').blur('input', function() {    
+		console.log('hello');	
 	$( this ).next( "p" ).hide();
 	
 	var input=$(this);
@@ -33,6 +36,7 @@ $(document).ready(function() {
 
 	
 	$('#fname').blur('input', function() {
+		console.log('entered');
 	$( this ).next( "p" ).hide(); 
 
 
@@ -87,7 +91,16 @@ $(document).ready(function() {
 	});
 	$('#email').blur('input', function() {    	
 	$( this ).next( "p" ).hide();
-	
+	$.ajax({
+		type:'GET',
+		url:'/register',
+		success:()=>{
+			alert('success');
+		},
+		error:(data)=>{
+			alert('error');
+		}
+	});
 	var input=$(this);
     var user_email=input.val();
 	if (validateEmail(user_email)){
@@ -103,6 +116,7 @@ $(document).ready(function() {
 	else{
     $( this ).next( "p" ).text("Enter a valid email").append('<i style="display:inline;color: #FF0000;">&#10008;</i>').show();
 	//$('#submit').click(function () {
+
         $('input[type=submit]').attr("disabled", "disabled");
         $('input[type=submit]').css("background-color", "grey");
         return false;
@@ -118,4 +132,5 @@ $(document).ready(function() {
 	}
 	}
 	});  
+	
 	});

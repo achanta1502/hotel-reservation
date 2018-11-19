@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    console.log('login');
     $("#password").after("<p>The password should be at least 8 characters</p>");
     $("#email").after("<p>Invalid E-mail ID!</p>");
     

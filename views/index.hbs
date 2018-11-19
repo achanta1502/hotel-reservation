@@ -1,12 +1,7 @@
 
 <div class="banner1">
 	{{> menu}}
-{{!-- <?php include 'menu.php';
-require_once('config.php');
-if(isset($_SESSION["sess_userid"])){
-	echo '<script type="text/javascript">location.href = "home.php";</script>';
-}
-?> --}}
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
@@ -67,42 +62,3 @@ if(isset($_SESSION["sess_userid"])){
 
 </body>
 </html>
-{{!-- 
-<?php
-
-if(isset($_POST['login']))
-{	
-	Login();
-}
-function Login()
-{
-
-$con=mysqli_connect(DBHOST, DBUSER, DBPASS, DBNAME);
-if(mysqli_connect_errno())
-{`                  
-echo "Failed to connect to MySQL: " . mysqli_connect_error();
-exit();
-}
-    $email=$_POST["email"];
-	$password=$_POST["pwd"];
-	$hashedpwd=md5($password);
-    $query = "SELECT * FROM `user` WHERE email_id = '$email'";
-    $result = mysqli_query($con,$query);
-    $row = mysqli_fetch_array($result);
-    if(mysqli_num_rows($result)>0 && $row['password'] == $hashedpwd && $row['email_id']==$email)
-    {
-        $_SESSION["sess_userid"]=$row['user_id'];
-        $_SESSION["sess_name"]=$row['name'];
-        mysqli_close($con);
-		session_write_close();
-		echo '<script type="text/javascript">location.href = "home.php";</script>';
-    }
-    else
-    {
-         echo "<script type='text/javascript'>alert('Invalid credentials entered. Please try again !');</script>";
-         mysqli_close($con);
-         
-    }
-    
-}
-?> --}}

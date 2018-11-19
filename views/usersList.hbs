@@ -48,7 +48,7 @@ if(!isset($_SESSION["sess_userid"])){
                                         <td>{{phone}} </td>
                                         <td>
                                             <a href="/custInfo?id={{user_id}}" class="btn btn-sm btn-info" data-toggle="tooltip" title="Edit & View" id="btnEdit"><span class="glyphicon glyphicon glyphicon-edit"></span></a>
-                                            <a href="/usersList?page={{page}}&deleteId={{user_id}}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete" id="btnDel" ><span class="glyphicon glyphicon-trash"></span></a>
+                                            <a href="/usersList?page=1&deleteId={{user_id}}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete" id="btnDel" ><span class="glyphicon glyphicon-trash"></span></a>
                                         </td>
                                     </tr>
                                     {{/each}}
