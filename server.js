@@ -4,8 +4,9 @@ const bodyParser = require('body-parser');
 const port=3000;
 const {mongoose} =require('./db/mongoose');
 const hbs=require('hbs');
+const fs=require('fs');
 const multer=require('multer');
-
+var dateFormat=require('dateformat');
 //var popup = require('popups');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
@@ -30,7 +31,17 @@ hbs.registerHelper('times', function(n, block) {
 });
 app.set('view engine','hbs');
 app.use(express.static(__dirname + '/public'));
-
+app.use((req, res, next)=>{
+  var now=new Date().toString();
+  var log=`${now}:${req.method} ${req.url}`;
+console.log(log);
+fs.appendFile('server.log',log+'\n',(err)=>{
+  if(err){
+    console.log('Unable to append to server.log');
+  }
+})
+  next();
+});
 const storage=multer.diskStorage({
   destination:function(req,file,cb){
     cb(null, './uploads/');
@@ -55,6 +66,8 @@ hbs.registerHelper('getCurretnYear',()=>{           //to render the values into 
 //session variables
 app.use(express.static(__dirname + '/uploads'));
 app.use(session({secret:'abc123',saveUninitialized:false,resave: false}));
+
+//homepage
 app.get('/',(req,resp)=>{
   if(req.session.sess_userid!=null){
     var admin=0;
@@ -72,8 +85,18 @@ app.get('/',(req,resp)=>{
   app.get('/addCity',(req,res)=>{
     res.status(200).render('addCity.hbs');
   });
-  app.get('/email',(req,res)=>{
-    res.json({'hello':'hi'});
+  app.post('/email',(req,res)=>{
+    var email=Object.keys(req.body).pop();
+    var valid;
+    User.findOne({'email':email},(err,doc)=>{
+      if(doc!=null){
+        valid=true;
+      }else{
+        valid=false;
+      }
+      res.send(valid);
+    });
+   
   });
   app.get('updateCity',(req,res)=>{
     res.render('updateCity.hbs');
@@ -88,7 +111,9 @@ app.get('/',(req,resp)=>{
         admin=1;
       }
       Hotel.getHotel((result1)=>{
-        resp.status(200).render('home.hbs',{obj1:result1,'name':req.session.sess_name,admin});
+        var min=dateFormat(new Date(), "yyyy-mm-dd");
+        
+        resp.status(200).render('home.hbs',{obj1:result1,'name':req.session.sess_name,admin,'min':min});
        });
     }else{
       resp.render('index.hbs');
@@ -102,7 +127,12 @@ app.get('/',(req,resp)=>{
     resp.render('contact.hbs');
   });
   app.get('/home',(req,resp)=>{
-    resp.render('home.hbs');
+    var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
+    resp.render('home.hbs',{name,admin});
   });
 
   //to register into portal
@@ -165,10 +195,10 @@ app.get('/',(req,resp)=>{
     User.findOne({'email':body.email},(err,result)=>{
       if(err) throw err;
       if(result==null){
-        res.status(401).render('index.hbs',{output:'Email incorrect'});
+        var aler=1;
+        res.status(401).render('index.hbs',{aler});
       }else{
         if(bycrypt.compareSync(body.password,result.password)) {
-          console.log('successful');
           req.session.sess_userid=result.user_id;
           req.session.sess_name=result.name;
           var admin=0;
@@ -176,12 +206,13 @@ app.get('/',(req,resp)=>{
             admin=1;
           }
          Hotel.getHotel((result1)=>{
-           res.status(200).render('home.hbs',{obj1:result1,'name':result.name,admin});
+          var min=dateFormat(new Date(), "yyyy-mm-dd");
+           res.status(200).render('home.hbs',{obj1:result1,'name':result.name,admin,'min':min});
           });
-         
-         
+                
          } else {
-          res.status(401).render('index.hbs',{output:'password incorrect'});
+          var aler=1;
+          res.status(401).render('index.hbs',{aler});
          }
       }
       
@@ -205,13 +236,21 @@ app.get('/hotel',(req,res)=>{
         res.status(200).send(obj);
     });
   }); 
+
+  //main home page
 app.post('/home',(req,res)=>{
   var body=_.pick(req.body,['check_in','check_out','noOfPersons','hotel_id']);
   app.locals.obj2=body;
   res.status(200).write('<script type="text/javascript">location.href = "search?page=1";</script>');
 });
+
+//search page get request
 app.get('/search',(req,res)=>{
-  
+var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var pagenumber=req.query.page;
   var feature_id=req.query.feature;
   var hotel_id=app.locals.obj2.hotel_id;
@@ -235,7 +274,7 @@ if(feature_id){
       Search.find({'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},$and:[{$or:[{'check_in':{$gt:new Date(check_in)}},{'check_out':{$lt:new Date(check_in)}}]},{$or:[{'check_in':{$gt:new Date(check_out)}},{'check_out':{$lt:new Date(check_out)}}]}]},(err,result)=>{
         console.log(result);
         pageCount=Math.ceil(result.length/5);
-           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,'feature':feature_id});
+           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,'feature':feature_id,name,admin});
          
           
       }).skip(skip).limit(limit);
@@ -246,7 +285,7 @@ if(feature_id){
       Search.find({'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)}},(err,result)=>{
       console.log(result);
          pageCount=Math.ceil(result.length/5);
-            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,'feature':feature_id});   
+            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,'feature':feature_id,name,admin});   
        }).skip(skip).limit(limit);
       }
 });
@@ -260,7 +299,7 @@ if(feature_id){
       Search.find({'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)},$and:[{$or:[{'check_in':{$gt:new Date(check_in)}},{'check_out':{$lt:new Date(check_in)}}]},{$or:[{'check_in':{$gt:new Date(check_out)}},{'check_out':{$lt:new Date(check_out)}}]}]},(err,result)=>{
      
         pageCount=Math.ceil(result.length/5)+1;
-           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount});
+           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,name,admin});
          
           
       }).skip(skip).limit(limit);
@@ -270,7 +309,7 @@ if(feature_id){
       Search.find({'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)}},(err,result)=>{
       console.log('result',result);
          pageCount=Math.ceil(result.length/5)+1;
-            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount});   
+            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,name,admin});   
        }).skip(skip).limit(limit);
       }
 });
@@ -278,7 +317,12 @@ if(feature_id){
   
 });
 app.post('/search',(req,res)=>{
-  var feature_id=req.query.feature;
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
+var feature_id=req.query.feature;
 var feature_id=app.locals.feature_id;
 var hotel_id=app.locals.obj2.hotel_id;
 var check_in=app.locals.obj2.check_in;
@@ -311,7 +355,7 @@ if(name_filter_flag && !feature_id){
       Search.find({'room_type':name_filter,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:occupancy},$and:[{$or:[{'check_in':{$gt:new Date(check_in)}},{'check_out':{$lt:new Date(check_in)}}]},{$or:[{'check_in':{$gt:new Date(check_out)}},{'check_out':{$lt:new Date(check_out)}}]}]},(err,result)=>{
         
         pageCount=Math.ceil(result.length/5);
-           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount});
+           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,name,admin});
          
           
       }).skip(skip).limit(limit);
@@ -321,7 +365,7 @@ if(name_filter_flag && !feature_id){
       Search.find({'room_type':name_filter,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)}},(err,result)=>{
       
          pageCount=Math.ceil(result.length/5);
-            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount});   
+            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,name,admin});   
        }).skip(skip).limit(limit);
       }
 });
@@ -338,7 +382,7 @@ else if(name_filter_flag && feature_id){
       Search.find({'room_type':name_filter,'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:occupancy},$and:[{$or:[{'check_in':{$gt:new Date(check_in)}},{'check_out':{$lt:new Date(check_in)}}]},{$or:[{'check_in':{$gt:new Date(check_out)}},{'check_out':{$lt:new Date(check_out)}}]}]},(err,result)=>{
         
         pageCount=Math.ceil(result.length/5);
-           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount});
+           res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,name,admin});
          
           
       }).skip(skip).limit(limit);
@@ -348,7 +392,7 @@ else if(name_filter_flag && feature_id){
       Search.find({'room_type':name_filter,'feature_id':feature_id,'status':1,'hotel_id':hotel_id,'max_occupancy':{$gte:parseInt(occupancy)}},(err,result)=>{
       
          pageCount=Math.ceil(result.length/5);
-            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount});   
+            res.render('search.hbs',{output:result,len:result.length,prevPage:parseInt(pagenumber)-1,nextPage:parseInt(pagenumber)+1,pageCount,name,admin});   
        }).skip(skip).limit(limit);
       }
 });
@@ -358,14 +402,19 @@ else if(name_filter_flag && feature_id){
 
 //add to wishlist
 app.get('/wishlist',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var room_id=req.query.room_id;
   var user_id=req.session.sess_userid;
+
   Wishlist.findOne({room_id:room_id},(err,result)=>{
     
     if(result!=null && result.room_id==room_id){
-    var aler="<script type='text/javascript'>alert('Room already exists in your wishlist!');</script>";
-    console.log('already exist',result.room_id);
-   res.status(200).render('search.hbs',{aler:aler});
+    var aler="<script type='text/javascript'>alert('Room already exists in your wishlist!');window.location.href='/search?page=1'</script>";
+   res.status(200).render('search.hbs',{aler:aler,name,admin});
       
     }else{
       console.log(room_id,user_id);
@@ -392,8 +441,8 @@ app.get('/wishlist',(req,res)=>{
         };
         var wishlist=new Wishlist(obj);
         wishlist.save().then(()=>{
-          var aler="<script type='text/javascript'>alert('New room added to wishlist');</script>";
-              res.status(200).render('search.hbs',{aler:aler});
+          var aler="<script type='text/javascript'>alert('New room added to wishlist');window.location.href='/search?page=1'</script>";
+              res.status(200).render('search.hbs',{aler:aler,name,admin});
         }).catch((err)=>{
           console.log(err);
         });
@@ -410,6 +459,11 @@ app.get('/wishlist',(req,res)=>{
 });
 
 app.get('/single',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var room_id=req.query.room_id;
   var src=req.query.src;
   var wishlist_id=req.query.wishlist_id;
@@ -425,7 +479,7 @@ app.get('/single',(req,res)=>{
       var price=costcount*parseInt(docs.price);
       var serviceCharge=Math.round(price*0.15);
       var amountFinal=price+serviceCharge;
-      res.render('single.hbs',{room_id,room_type,max_occupancy,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal,len:1});
+      res.render('single.hbs',{room_id,room_type,max_occupancy,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal,len:1,name,admin});
     });
   }
     if(src=='wishlist' && wishlist_id!=null){
@@ -453,7 +507,7 @@ app.get('/single',(req,res)=>{
             var amountFinal=price+serviceCharge;
            
            //console.log(checkin);
-            res.render('single.hbs',{room_id,room_type,max_occupancy,noOfPersons,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal,len:0,flag});
+            res.render('single.hbs',{room_id,room_type,max_occupancy,noOfPersons,check_in,check_out,image_url,feature_name,price,serviceCharge,amountFinal,len:0,flag,name,admin});
           }
         });
       });
@@ -599,6 +653,10 @@ if(src=='search'){
 app.get('/bookings',(req,res)=>{
   var user_id=req.session.sess_userid;
   var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   if(user_id!=null){
   Search.find({'user_id':user_id},(err,docs)=>{
     var pages=1;
@@ -608,7 +666,7 @@ pages=Math.ceil(docs.length/2);
     var offset=(pages-1)*2;
     var start=offset+1;
     var end=Math.min(offset+2,docs.length);
-    res.render('booking.hbs',{docs,name});
+    res.render('booking.hbs',{docs,name,admin});
   });}  
   else{
     res.render('index.hbs');
@@ -618,6 +676,11 @@ pages=Math.ceil(docs.length/2);
 
 //admin pages go down from heres
 app.get('/wishlists',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var pagenumber=parseInt(req.query.page);
 var start=pagenumber*2-2;
 var end=pagenumber*2;
@@ -636,11 +699,16 @@ var pageCount;
   if(room_delete!=1){
   Wishlist.find({'user_id':user_id,'status':1},(err,docs)=>{ 
     pageCount=Math.ceil(docs.length/2)+1;
-    res.render('wishlist.hbs',{name:'pavan',docs,len:docs.length,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1});
+    res.render('wishlist.hbs',{name,admin,docs,len:docs.length,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1});
   }).skip(skip).limit(limit);
 }
 });
 app.get('/manageHotel',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
 var deleteRoom=req.query.deleteId;
 MongoClient.connect(url,function(err,db){
 if(err) throw err;
@@ -655,16 +723,21 @@ if(deleteRoom!=null){
    });
 }else{
 //console.log(results);
-res.status(200).render('manageHotel.hbs',{output:results});
+res.status(200).render('manageHotel.hbs',{output:results,name,admin});
 }
 });
 });
 
 });
 app.post('/addCityDetails',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var body=_.pick(req.body,['name','address','zipcode']);
   if(!body.name || !body.address || !body.zipcode){
-    res.status(401).render(addCity.hbs);
+    res.status(401).render('addCity.hbs',{name,admin});
   }
   Hotel.findOne({},(err,result)=>{
     if(err) throw err;
@@ -689,10 +762,15 @@ hotel.save().then(()=>{
   }).sort({'hotel_id':-1});
 });
 app.get('/updateCity',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var hotel_id=req.query.cityId;
   app.locals.updateId=hotel_id;
   Hotel.findOne({'hotel_id':hotel_id,'status':1},(err,result)=>{
-    res.status(200).render('updateCity.hbs',{"city":result.city,'address':result.address,'zipcode':result.zipcode});
+    res.status(200).render('updateCity.hbs',{name,admin,"city":result.city,'address':result.address,'zipcode':result.zipcode});
   });
 });
 app.post('/updateCityDetails',(req,res)=>{
@@ -705,6 +783,11 @@ app.post('/updateCityDetails',(req,res)=>{
   });
 });
 app.get('/roomInfo',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var hotelId=req.query.city;
   var page=req.query.page;
   var search=req.query.search;
@@ -726,12 +809,12 @@ app.get('/roomInfo',(req,res)=>{
           
         Hotel.findOne({'hotel_id':hotelId},(err,docs1)=>{
           if(err) console.log('error');
-          res.render('roomInfo.hbs',{'id':parseInt(hotelId),cityname:docs1.city,output:app.locals.cities});
+          res.render('roomInfo.hbs',{'id':parseInt(hotelId),cityname:docs1.city,output:app.locals.cities,name,admin});
           
         });}
         if(result!=null){
           
-          res.render('roomInfo.hbs',{'result':result,'id':hotelId,'noOfPages':noOfPages,'previous':previous,'next':next});
+          res.render('roomInfo.hbs',{name,admin,'result':result,'id':hotelId,'noOfPages':noOfPages,'previous':previous,'next':next});
         }
     }).limit(end).skip(start);
   }
@@ -740,31 +823,41 @@ app.get('/roomInfo',(req,res)=>{
     app.locals.cities=docs;
     if(err) console.log('error');  
     res.setHeader('Content-Type','text/html');
-    res.render('roomInfo.hbs',{output:docs});
+    res.render('roomInfo.hbs',{output:docs,name,admin});
        
   });}
   if(hotelId!=null && search!='search'){
     
   Hotel.findOne({'hotel_id':hotelId},(err,docs1)=>{
     if(err) console.log('error');
-    res.render('roomInfo.hbs',{'id':hotelId,cityname:docs1.city,output:app.locals.cities});
+    res.render('roomInfo.hbs',{'id':hotelId,cityname:docs1.city,output:app.locals.cities,name,admin});
     
   });}
 
 
 });
 app.get('/addRoom',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   app.locals.hotelId=req.query.hotelId;
 
   if(req.query.hotelId.length<1){
-    res.render('roomInfo.hbs',{aler:"<script type='text/javascript'>alert('Select Hotel');</script>"});
+    res.render('roomInfo.hbs',{aler:"<script type='text/javascript'>alert('Select Hotel');</script>",name,admin});
   }else{
   Feature.find({},(err,docs)=>{
-    res.render('addRoom.hbs',{docs});
+    res.render('addRoom.hbs',{docs,name,admin});
   });
 }
 });
 app.post('/addRoomDetails',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var hotelId=app.locals.hotelId;
   var body=_.pick(req.body,['desc','price','roomType','max_occupancy','features[]']);
 
@@ -814,6 +907,11 @@ room_id=result.room_id+1;
  }).sort({'room_id':-1});
 });
 app.get('/roomUpdate',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var roomId=req.query.roomId;
   var city=req.query.city;
   Search.findOne({'room_id':roomId,'status':1},(err,result)=>{
@@ -828,11 +926,16 @@ app.get('/roomUpdate',(req,res)=>{
     app.locals.roomId=roomId;
     app.locals.city=city;
     Feature.find({},(err,docs)=>{
-    res.status(200).render('roomUpdate.hbs',{'image_url':result.image_url,'room_desc':result.room_desc,'price':result.price,'room_type':result.room_type,'max_occupancy':result.max_occupancy,featureid,docs,featurenames,result}); 
+    res.status(200).render('roomUpdate.hbs',{name,admin,'image_url':result.image_url,'room_desc':result.room_desc,'price':result.price,'room_type':result.room_type,'max_occupancy':result.max_occupancy,featureid,docs,featurenames,result}); 
   });
   });
 });
 app.post('/roomUpdateDetails',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
 var image_url=app.locals.image_url;
 var room_id=app.locals.roomId;
 var city=app.locals.city;
@@ -860,7 +963,7 @@ app.post('/uploadScripts',upload.single('upload_file'),(req,res)=>{
 app.post('/uploadScripts1',upload.single('upload_file'),(req,res)=>{
   app.locals.image_url=req.file.filename;
   //res.send("<img id='imgsrc' class='imgsrc' src='"+req.file.filename+"' width='192px' height='192px'></img> <input type='hidden' name='imgsrc' form='roomUpdate' value='"+req.file.filename+"'/>");
- res.status(200).render('roomUpdate.hbs',{'image_url':req.file.filename});
+ res.status(200).render('roomUpdate.hbs',{'image_url':req.file.filename,name,admin});
 });
 app.get('/roomDelete',(req,res)=>{
   var room_id=req.query.deleteId;
@@ -873,6 +976,11 @@ app.get('/roomDelete',(req,res)=>{
   });
 });
 app.get('/usersList',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var pagenumber=parseInt(req.query.page);
   var deleteId=req.query.deleteId;
   var start=pagenumber*5-5;
@@ -883,7 +991,7 @@ var pageCount;
   if(!deleteId){
   User.find({'user_id':{$gt:0},'status':1},(err,docs)=>{
     pageCount=Math.ceil(docs.length/5)+1;
-    res.render('usersList.hbs',{output:docs,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1,'page':pagenumber})
+    res.render('usersList.hbs',{name,admin,output:docs,pageCount,'prevPage':pagenumber-1,'nextPage':pagenumber+1,'page':pagenumber})
   }).skip(skip).limit(limit);
 }
 if(deleteId){
@@ -893,14 +1001,21 @@ if(deleteId){
 }
 });
 app.get('/custInfo',(req,res)=>{
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   var user_id=req.query.id;
   User.findOne({user_id},(err,result)=>{
-    res.render('custInfo',result);
+    res.render('custInfo',{'name1':result.name,'email':result.email,'phone':result.phone,name,admin});
   });
 });
 app.post('/custInfo',(req,res)=>{
   var user_id=req.query.id;
+  
   User.findOneAndUpdate({user_id:user_id},{$set:{'email':req.body.email,'name':req.body.name,'phone':req.body.phone}},(err,result)=>{
+    console.log(result);
     res.redirect('/usersList?page=1');
   })
 });
@@ -929,9 +1044,13 @@ app.post('/forgotpassword',(req,res)=>{
   });
 });
 app.get('/editProfile',(req,res)=>{
-  
+  var name=req.session.sess_name;
+          var admin=0;
+          if(req.session.sess_userid==1){
+            admin=1;
+          }
   User.findOne({'user_id':req.session.sess_userid},(err,doc)=>{
-    res.render('editProfile.hbs',doc);
+    res.render('editProfile.hbs',{'email':doc.email,'phone':doc.phone,name,admin});
 
   });
 

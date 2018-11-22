@@ -1,7 +1,7 @@
 
 <div class="banner1">
 	{{> menu}}
-
+	
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
@@ -36,8 +36,10 @@
 </div>
 <div class="banner-bottom1">
 	
-		<h3 class="tittle"> Member Login</h2>
-		<h5 class="tittle">{{output}}</h5>
+		<h3 class="tittle"> Member Login</h3>
+		{{#if aler}}
+		<div class="alert alert-danger" role="alert">Invalid Credentials!</div>
+		{{/if}}
 		<form method="POST" action="/login">
 		<input type="text" id="email" name="email" placeholder="Enter your Email ID"/>
 		<br/><br/>
