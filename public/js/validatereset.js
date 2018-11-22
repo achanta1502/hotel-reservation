@@ -8,7 +8,24 @@ $(document).ready(function() {
     $('#email').blur('input', function() {
     $( this ).next( "p" ).hide(); 
    
-
+    var email=$('#email').val();
+	
+	$.ajax({
+		type:'POST',
+		url:'/email',
+		data:email,
+		success:(valid)=>{
+			if(!valid){
+				alert('No email registered');
+				$( this ).next( "p" ).text("Enter a different email").append('<i style="display:inline;color: #FF0000;">&#10008;</i>').show();
+        $('input[type=submit]').attr("disabled", "disabled");
+        $('input[type=submit]').css("background-color", "grey");
+			}
+		},
+		error:()=>{
+			alert('error');
+		}
+	});
 	var input=$(this);
     var email=input.val();
     var len=email.length;
