@@ -352,7 +352,7 @@ min-height: 855px;
  font-family: 'Alegreya-Regular';
   text-decoration: none;
 	padding: 0 0 6px 0;
-	color:#fff;
+	color:#373737;
 	text-shadow: none;
 } 
 
@@ -364,7 +364,7 @@ min-height: 855px;
 	padding: 0 0 6px 0;
 	max-width: 0;
 	border-bottom: 2px solid #fff;
-	color: #DF1E1C;
+	color: #373737;
 	content: attr(data-hover);
 	-webkit-transition: max-width 0.5s;
 	-moz-transition: max-width 0.5s;
@@ -399,7 +399,7 @@ nav a:focus {
   padding-top: 40px;
 }
 .header-nav .glyphicon-home {
-  color:#ECCA69;
+  color:url("../images/galaxy1.jpg");;
   font-size: 30px;
   margin-right: 10px;
   top: 0;
@@ -478,7 +478,7 @@ width: 60%;
 margin-top: 20px;
 }
 .navigation ul li a.active {
-  color: #DF1E1C;
+  color: #373737;
 }
 .social-icons{
 float:right;
@@ -486,7 +486,7 @@ float:right;
 /*-- //header --*/
 .banner-bottom {
   margin-top: 30px;
-  background: #ECCA69;
+  background: url("../images/galaxy1.jpg");
   padding: 25px;
 }
 .banner-info {
@@ -495,7 +495,7 @@ float:right;
 .banner-text h3 {
   font-size: 36px;
  font-family: 'Alegreya-Regular';
-  color:#ECCA69;
+  color:url("../images/galaxy1.jpg");;
   text-align: center;
 }
 .banner-text h4 {
@@ -523,8 +523,11 @@ float:right;
   text-transform: uppercase;
   border: none;
   outline: none;
-  background:#DF1E1C;
+  background:#373737;
   color: #fff; 
+}
+a{
+	color:#373737;
 }
 .search input[type="submit"]:hover{
 background:#000;
@@ -689,8 +692,8 @@ float:left;
 width:30%;
 }
 h3.tittle,h2.tittle-one{
-margin-bottom:20px;
-color:#DF1E1C;
+margin-bottom:50px;
+color:#373737;
 font-size:36px;
  font-family: 'Alegreya-Regular';
 text-align:center;
@@ -710,7 +713,7 @@ color:#464646;
 text-decoration:none;
 }
 .welcome-grids ul li a:hover{
-color:#DF1E1C;
+color:#373737;
 padding-left: 8px;
 }
 .welcome p{
@@ -755,7 +758,7 @@ float:right;
 width:75%;
 }
 .services-bottom-grd-right h4 {
-  color: #DF1E1C;
+  color: #373737;
   font-size: 25px;
  font-family: 'Alegreya-Regular';
   text-transform: capitalize;
@@ -773,7 +776,8 @@ margin-top:30px;
 /*-- //services --*/
 /*--gallery--*/
 .gallery{
-background:#ECCA69;
+background:#654321;
+background-color: rgba(0, 0, 0, .3);
 }
 .view {
   border: 3px solid #fff;
@@ -860,11 +864,11 @@ background:#ECCA69;
    transition: all 0.3s ease-in-out;
 }
 .view-fifth h4 {
-  background: #ECCA69;
+  background: url("../images/galaxy1.jpg");;
   font-size: 22px;
   font-weight: 500;
  font-family: 'Alegreya-Regular';
-  color: #DF1E1C;
+  color: #373737;
   -webkit-box-shadow: 0px 1px 3px rgba(159, 141, 140, 0.5);
   -moz-box-shadow: 0px 1px 3px rgba(159, 141, 140, 0.5);
   box-shadow: 0px 1px 3px rgba(159, 141, 140, 0.5);
@@ -911,7 +915,7 @@ margin:30px 0;
 }
  .ftr_navi h3 {
   margin-bottom: 15px;
-  color: #ECCA69;
+  color: url("../images/galaxy1.jpg");;
   font-size: 22px;
  font-family: 'Alegreya-Regular';
   font-weight: 500;
@@ -927,7 +931,7 @@ font-size: 14px;
 color: #fff;
 }
 .ftr_navi ul li a:hover {
-color:#ECCA69;
+color:url("../images/galaxy1.jpg");;
 padding-left:5px;
 }
 .ftr-logo a{
@@ -979,7 +983,7 @@ background: url(../images/img-sprite-hover.png) no-repeat -78px 0px;
 }
 .ftr-logo span{
   margin-right: 10px;
-  color: #ECCA69;
+  color: url("../images/galaxy1.jpg");;
   font-size: 30px;
   top: 0;
 }
@@ -997,7 +1001,7 @@ color: #ffffff;
 }
 .copy-right p a{
 text-decoration:none;
-color: #ECCA69;
+color: url("../images/galaxy1.jpg");;
 }
 .copy-right p a:hover{
 color:#fff;
@@ -1007,7 +1011,7 @@ color:#fff;
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background:#ECCA69;
+  background:url("../images/galaxy1.jpg");;
   margin: 0 auto;
   text-align: center;
   position: relative;	
@@ -1081,7 +1085,7 @@ color:#fff;
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background:#ECCA69;
+  background:url("../images/galaxy1.jpg");;
   position: absolute;
   top: 0;
   left: 0;
@@ -1130,7 +1134,7 @@ color:#fff;
 	width: 19px;
 	height: 20px;
 	outline: none;
-  border: 3px solid #DF1E1C;
+  border: 3px solid #373737;
   background: #fff;
 	border-radius:3px;
 	-webkit-border-radius:3px;
@@ -1163,7 +1167,7 @@ color:#fff;
 	opacity: 1;
 }
 .checkbox input:checked + i {
-  border: 3px solid #DF1E1C;
+  border: 3px solid #373737;
   background: #fff;
 }
 .radio {
@@ -1198,7 +1202,7 @@ color:#fff;
 	width:18px;
 	height:18px;
 	outline: none;
-  border: 3px solid #DF1E1C;
+  border: 3px solid #373737;
   background: #fff;
 	cursor:pointer;
 }
@@ -1255,7 +1259,7 @@ label.checkbox {
   text-align: center;
 }
 .radio input:checked + i {
-  border: 3px solid #DF1E1C;
+  border: 3px solid #373737;
   background: #fff;
 }
 /*--about-starts--*/
@@ -1268,7 +1272,7 @@ label.checkbox {
 .about-bottom h4 {
   margin: 15px 0;
   line-height: 1.4em;
-  color: #DF1E1C;
+  color: #373737;
   font-size: 22px;
  font-family: 'Alegreya-Regular';
 }
@@ -1285,7 +1289,7 @@ label.checkbox {
 	width: 100%;
 }
 .vsn-right h4 {
-  color: #DF1E1C;
+  color: #373737;
   font-size: 22px;
   margin: 0px;
   line-height: 1.4em;
@@ -1307,7 +1311,7 @@ label.checkbox {
 }
 .glyphicon-share-alt {
 	font-size: 15px;
-	color: #DF1E1C;
+	color: #373737;
 	border: none;
 	display: inline-block;
 	vertical-align: middle;
@@ -1322,7 +1326,7 @@ text-decoration:none;
 }
 .vision-right ul li a:hover {
   margin-left: 15px;
-  color: #DF1E1C;
+  color: #373737;
 }
 /*--staff--*/
 .ch-item {
@@ -1432,7 +1436,7 @@ text-decoration:none;
 }
 .ch-info h4{
   font-family: 'Alegreya-Regular';
-	color: #DF1E1C;
+	color: #373737;
 	text-transform: uppercase;
 	letter-spacing: 2px;
   font-size: 20px;
@@ -1462,7 +1466,7 @@ text-decoration:none;
 }
 
 .ch-item:hover .ch-info-back {
-	background: #ECCA69;
+	background: url("../images/galaxy1.jpg");;
 }
 /*--common css--*/
 .ch-grid {
@@ -1696,7 +1700,7 @@ border:none;
 	}
 .contact-form input[type="submit"]{
   outline: none;
-  background: #DF1E1C;
+  background: #373737;
   transition: 0.5s all;
   -webkit-transition: 0.5s all;
   -moz-transition: 0.5s all;
@@ -1709,7 +1713,7 @@ border:none;
   border: none;
 	}
 .contact-form input[type="submit"]:hover{
-	background:#ECCA69;
+	background:url("../images/galaxy1.jpg");;
 	}
 /*-- //contact --*/
 /*-------reservation -----*/
@@ -1720,7 +1724,7 @@ margin-top: 25px;
 }
 .reservation-right h4 {
   margin-bottom: 25px;
-  color: #DF1E1C;
+  color: #373737;
   font-size: 25px;
  font-family: 'Alegreya-Regular';
 }
@@ -1821,7 +1825,7 @@ input#datepicker ,input#datepicker1 ,input#datepicker2 {
 }
 /*--//reservation --*/
 input[type="submit"].btn1.btn-1.btn-1e {
-  background: #DF1E1C;
+  background: #373737;
   font-size: 20px;
   outline: none;
   border: none;
@@ -1834,7 +1838,7 @@ input[type="submit"].btn1.btn-1.btn-1e {
 	-ms-transition:0.5s all;
 }
 input[type="submit"].btn1.btn-1.btn-1e:hover {
-background:#ECCA69;
+background:url("../images/galaxy1.jpg");;
 color:#464646;
 }
 .book-pag-frm{
@@ -1856,7 +1860,7 @@ input[type="time"], input[type="datetime-local"], input[type="month"] {
   line-height: 0px;
 }
 .reservation-left h3 {
-  color: #DF1E1C;
+  color: #373737;
   font-size: 25px;
  font-family: 'Alegreya-Regular';
 }
@@ -1898,7 +1902,7 @@ input[type="time"], input[type="datetime-local"], input[type="month"] {
 	}
 h3.sear-head {
   font-family: 'Alegreya-Regular';
-color:#DF1E1C;
+color:#373737;
   margin-bottom: 10px;
   font-size: 19px;
  font-weight:600;
@@ -2021,7 +2025,7 @@ ul {
   text-indent: 15px;
   display: block;
   position: relative;
-  color: #DF1E1C;
+  color: #373737;
   text-decoration: none;
   font-size: 19px;
   font-weight: 600;
@@ -2047,7 +2051,7 @@ ul {
   left: -13px;
 }
 .menu_drop ul li a:hover {
-color:#DF1E1C;
+color:#373737;
 }
 .menu_drop > li > a:hover, .menu > li > a.active {
 color:#fff;
@@ -2074,7 +2078,7 @@ width:28%;
 }
 .hotel-right h4{
 font-weight: 600;
-color:#DF1E1C;
+color:#373737;
 font-size:26px;
 margin-top: 64px;
 }
@@ -2096,12 +2100,12 @@ font-size:18px;
 padding:6px 16px;
 }
 .hotel-right a:hover{
-background:#DF1E1C;
+background:#373737;
 }
 .hotel-left a {
   font-family: 'Alegreya-Regular';
   text-decoration: underline;
-  color: #DF1E1C;
+  color: #373737;
   font-size: 19px;
  font-weight:600;
   }
@@ -2112,7 +2116,7 @@ background:#DF1E1C;
   margin-right: 12px;
   background: #000;
   padding: 4px;
-  border: 2px solid #DF1E1C;
+  border: 2px solid #373737;
   border-radius: 5px;
 }
 .hotel-left p{
@@ -2175,7 +2179,7 @@ display:block;
 /*-- single-page --*/
 .single-pg-hdr h2{
 font-family: 'Alegreya-Regular';
-color: #DF1E1C;
+color: #373737;
 font-size:25px;
 }
 .single-pg-hdr h2 span{
@@ -2185,7 +2189,7 @@ font-size:25px;
   margin-right: 12px;
   background: #000;
   padding: 4px;
-  border: 2px solid #DF1E1C;
+  border: 2px solid #373737;
   border-radius: 5px;
 }
 .single-pg-hdr p {
@@ -2194,7 +2198,7 @@ font-size:25px;
   margin: 16px 0 0 0;
 }
 .single-pg-hdr a {
-  color: #DF1E1C;
+  color: #373737;
   margin: 0 8px;
 }
 .single-pg-hdr{
@@ -2211,7 +2215,7 @@ display:inline-block;
 }
 .spl-btn-bor {
   padding: 8px 20px;
-background: #DF1E1C;
+background: #373737;
 }
 .spl-btn-bor span{
 margin-right: 10px;
@@ -2222,7 +2226,7 @@ top:0;
 .spl-btn h4 {
 text-align:right;
   font-weight: 600;
-  color: #DF1E1C;
+  color: #373737;
   font-size: 26px;
 }
 .spl-btn h4 span {
@@ -2244,7 +2248,7 @@ text-align:right;
   padding: 6px 16px;
 }
  a.best-btn:hover {
-  background: #DF1E1C;
+  background: #373737;
 }
 .sp-bor-btn{
 padding:20px;
@@ -2266,7 +2270,7 @@ padding:10px;
 .comments-head h3 {
   float: left;
   font-family: 'Alegreya-Regular';
-  color: #DF1E1C;
+  color: #373737;
   font-size: 25px;
 }
 .comments-head p{
@@ -2289,7 +2293,7 @@ font-weight:bold;
   margin-top: 10px;
   font-size: 19px;
   font-family: 'Alegreya-Regular';
-  color: #DF1E1C;
+  color: #373737;
 }
 .comments-bot .glyphicon-minus {
   font-size: 9px;
@@ -2574,7 +2578,7 @@ font-weight:bold;
 	}
 	ul.nav1 {
 	  display: none;
-	  background: #ECCA69;
+	  background: url("../images/galaxy1.jpg");;
 	}
 	.navigation ul.nav1 li {
 	display: inline-block;
@@ -3478,8 +3482,8 @@ font-weight:bold;
 .responstable th {
   display: none;
   border: 1px solid #fff;
-  background-color: #ecca69;
-  color: rgb(235, 22, 15);
+  background-color: url("../images/galaxy1.jpg");;
+  color: rgb(55, 55, 55);
   padding: 1em;
 }
 
@@ -3525,7 +3529,7 @@ font-weight:bold;
 	cursor: pointer;
 	border: none;
 	outline: none;
-	color: white;
+	color: grey;
 	padding: 14px 16px;
 	background-color: inherit;
 	font-size: 18px;
@@ -3534,7 +3538,7 @@ font-weight:bold;
 	font-family: 'Alegreya-Regular';
 	text-decoration: none;
 	padding: 0 0 6px 0;
-	color:#fff;
+	color:#373737;
 	text-shadow: none;
 }
 
@@ -3639,7 +3643,7 @@ font-weight:bold;
 	border: none;
 	margin: 10px;
 	outline: none;
-	background: #DF1E1C;
+	background: #373737;
 	color: #fff;
 	display: inline-block;
 	text-align: start;
@@ -3679,7 +3683,7 @@ font-weight:bold;
 	}
 
 	.banner-bottom1 {
-		background: #ECCA69;
+		background: url("../images/galaxy1.jpg");
 		text-align: center;
 		margin: auto;
 		width: 35%;

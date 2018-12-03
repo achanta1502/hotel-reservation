@@ -1,54 +1,4 @@
 
-{{!-- <?php include 'menu.php'; --}}
-{{!-- require_once('config.php');
-session_start();
-if(!isset($_SESSION["sess_userid"])){
-	echo '<script type="text/javascript">location.href = "index.php";</script>';
-	echo '<script type="text/javascript">alert("please login");</script>';	
-} --}}
-
-{{!-- if(isset($_GET["roomId"])){
-	$db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-	$roomId = $db->quote($_GET["roomId"]);
-	$query = $db->prepare("SELECT * FROM room where room_id=$roomId and status=1");
-	$query->execute();
-	$rooms=$query->fetchAll();
-	$query = $db->prepare("SELECT feature_name FROM room_features rf inner join features f on rf.feature_id= f.feature_id where room_id=$roomId");	
-	$query->execute();
-	$featuresSelected=$query->fetchAll();
-}
-if($_GET["src"] === "wishlist"){
-	$status=false;
-	$db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-	$wishlistId = $db->quote($_GET["wishlist_id"]);
-	$query = $db->prepare("SELECT * FROM wishlist where wishlist_id=$wishlistId");
-	$query->execute();
-	$wishlist=$query->fetch();
-	$roomId = $wishlist["room_id"];
-	//validate wishlist search
-	$check_in = $wishlist["checkin"];
-	$check_out = $wishlist["checkout"];
-	$noOfPeople = $wishlist["num_of_people"];
-	$query = "SELECT count(*) as count from room r
-	where room_id=$roomId and max_occupancy >= $noOfPeople and r.room_id NOT IN 
-	(select b.room_id from bookings b
-	where r.room_id = b.room_id and 
-	(('$check_in' >= b.checkin and '$check_in' <= b.checkout ) or 
-	('$check_out' >= b.checkin and '$check_out' <= b.checkout )));";
-	$result = $db->query($query)->fetch();
-	$total = $result['count'];
-	if($total > 0){
-		$status=true;
-	}
-	$db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-	$query = $db->prepare("SELECT * FROM room where room_id=$roomId and status=1");
-	$query->execute();
-	$rooms=$query->fetchAll();
-	$query = $db->prepare("SELECT feature_name FROM room_features rf inner join features f on rf.feature_id= f.feature_id where room_id=$roomId");
-	$query->execute();
-	$featuresSelected=$query->fetchAll();
-}
-?> --}}
 {{> menu}}
 <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <link type="text/css" rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
@@ -60,7 +10,7 @@ if($_GET["src"] === "wishlist"){
 		<div class="col-md-8 single-gd-lt">
 			<div class="single-pg-hdr">
 				<form method="post">
-					{{!--  --}}
+				
 					
 					<input type="hidden" name="roomId" value="{{room_id}}"/>
 					<h2><span class="glyphicon glyphicon-bed" aria-hidden="true"></span>{{room_type}}</h2>
@@ -69,10 +19,12 @@ if($_GET["src"] === "wishlist"){
 					<span class="margin-10"><b>Booking from:</b> {{check_in}}
 					<b>Booking to:</b>{{check_out}}</span>
 					 
-					{{!-- <?php }
-					else if($_GET["src"] === "wishlist"){
-					?> --}}
+					
 					{{else}}
+					{{#if aler}}
+					{{{aler}}}
+					{{/if}}
+				
 					<div class="sf-dates margin-10">
 						<table class="table-singlepage">
 							<tr>
@@ -80,7 +32,7 @@ if($_GET["src"] === "wishlist"){
 									<label for="checkin" class="margin-10"> Check-in : </label><br/>
 								</td>
 								<td>									
-									<input type="date" id="checkin" name ="check_in" value="{{check_in}}" class="margin-10"/>
+									<input type="date" id="checkin" name ="check_in" value={{check_in}} class="margin-10"/>
 								</td>
 							</tr>
 							<tr>
@@ -105,14 +57,14 @@ if($_GET["src"] === "wishlist"){
 								</td>
 								<td>
 									<p name="availStatus" class="green">
-									{{!-- <?php if($status) echo 'Available'; else echo 'Try other dates';?> --}}
+									
 									{{#if flag}} <p>Available</p{{else}}><p>Try other Dates</p>{{/if}}
 									</p>
 								</td>
 							</tr>
 						</table>
 					</div>
-					{{!-- <?php } ?> --}}
+					
 					{{/if}}
 					 
 					
@@ -130,7 +82,6 @@ if($_GET["src"] === "wishlist"){
 							<p class="best-pri"><b style="margin-right: 20px;">Service Charge(8%):</b>&nbsp;{{serviceCharge}}</p>
 							<p class="best-pri"><b style="margin-right: 12px;">Total Price:</b>&nbsp;${{amountFinal}}</p>
 							<input type="hidden" value="{{amountFinal}}" name="amountPaid"/>
-							{{!-- <?php $amountfinal =  $rooms[0]["price"]+$rooms[0]["price"]*.15 ?> --}}
 							<div class="search">
 								<input type="submit" name="booknow" value="Book Now" />
 							</div>

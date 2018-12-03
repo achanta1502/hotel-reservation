@@ -1,35 +1,17 @@
 {{{aler}}}
 {{> menu}}
+<head>
 
-    {{!-- if(!isset($_SESSION["sess_userid"])){
-        echo '<script type="text/javascript">location.href = "index.php";</script>';
-        echo '<script type="text/javascript">alert("please login");</script>';	
-    }
-?> --}}
-{{!-- <?php --}}
-    {{!-- $db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-    $query = $db->prepare("SELECT * FROM hotel");
-    $query->execute();
-    $rows=$query->fetchAll();
-    if(isset($_GET["deleteId"])){
-        deleteRoom($_GET["deleteId"]);
-    }
-    function deleteRoom($id){
-        $db = new PDO("mysql:dbname=".DBNAME.";host=".DBHOST, DBUSER, DBPASS);  
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
-        $updateQuery =  $db->prepare("UPDATE room SET status=0 WHERE room_id=$id");  
-        $result = $updateQuery->execute();
-    }
-?> --}}
+</head>
 
 <div class="search-page search-grid-full">
     <div class="container">
         <div class="tab-content">
-            <form action="">
+            <form action="/roomInfo">
                 <div class="droop-down">
                     <div class="droop">
                         <div class="sort-by">
-                            <select class="sel" name="city">
+                            <select class="sel" name="city" id="city">
                                 
                                     <option value="">CHOOSE CITY</option>  
                                     {{#each output}}
@@ -41,9 +23,12 @@
                     </div>
                     <div class="search">
                             <input type="submit" name="search" value="search">
+                           
                     </div>
+                    
                 </div>
             </form>	
+             <div class="text-capitalize" class="font-italic" class="font-weight-bold">{{cityname}}</div>
         </div>
     </div>
     <div class="search-page search-grid-full">
@@ -60,7 +45,7 @@
                                         </div>
                                         <div class="hotel-left-two">
                                             <div class="rating text-left">
-                                                <span><img alt="Customer Rating" src ="images/st<?php echo $rooms[$i]['customer_rating']; ?>.png"</span>
+                                                
                                             </div>
                                             <p>
                                                 <i>Features:</i>
@@ -81,7 +66,7 @@
                                 <div class="clearfix"></div>
                             </div>
                             {{/each}}
-                            <a href="/addRoom?hotelId={{id}}">Add Room</a>
+                            <a href="/addRoom?hotelId={{hotel_id}}">Add Room</a>
                             
                             <nav>
                                 <ul class="pagination pagination-lg">
@@ -97,13 +82,13 @@
                                 $noOfPages = ceil(count($rows)/5);
                                 $i = 0;
                                 ?> --}}
-                                <li><a href="/roomInfo?search=search&city={{hotelId}}&page={{previous}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+                                <li><a href="/roomInfo?search=search&city={{hotel_id}}&page={{previous}}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
                                
                                
-                               {{#times noOfPages}}
-                                    <li><a href="/roomInfo?city={{hotelId}}&search=search&page={{this}}">{{id}}</a></li>
+                                    {{#times noOfPages}}
+                                    <li><a href="/roomInfo?search=search&page={{this}}">{{this}}</a></li>
                                     {{/times}}
-                                <li><a href="/roomInfo?city={{hotelId}}&search=search&page={{next}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+                                <li><a href="/roomInfo?city={{hotel_id}}&search=search&page={{next}}" aria-label="Next"><span aria-hidden="true">»</span></a></li>
                                 </ul>
                             </nav>
                             {{!-- <?php
@@ -118,5 +103,6 @@
                   }
             ?> --}}
         </div>
+    </div>
     </div>
     </div>

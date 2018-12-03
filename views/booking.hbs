@@ -121,9 +121,9 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                                         </div>
                                     </div>
                                     <div class="hotel-right">
-                                    <h4><p><b>Check In Date:</b> {{check_in}}</p></h4>
-                                    <h4><p><b>Check Out Date:</b> {{check_out}}</p></h4>
-                                    <h4><p><b>Amount Paid:</b> {{amount_paid}}</p></h4>
+                                    <h4><p><b>Check In Date:</b> {{moment check_in add="days" amount="1" format="DD/MM/YYYY"}}</p></h4>
+                                    <h4><p><b>Check Out Date:</b> {{moment check_out add="days" amount="1" format="DD/MM/YYYY"}}</p></h4>
+                                    <h4><p><b>Amount Paid:$</b>{{amount_paid}}</p></h4>
                                 </div>
                                
                                    

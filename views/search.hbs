@@ -47,7 +47,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 				<div class="search-hotel">
 					<h3 class="sear-head">Name contains</h3>
 					<form method="POST" action='/search'>
-						<input type="text" style="color:black !important;" name="filter_text" value="Hotel name..." onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Hotel name...';}" required="">
+						<input type="text" style="color:black !important;" name="filter_text" value="Hotel type..." onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Hotel name...';}" required="">
 						<input type="submit" name="name_filter" value=" ">
 					</form>
 				</div>
@@ -55,6 +55,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 				<ul class="menu_drop">
 					<li class="item1"><a href="#"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>Features</a>
 						<ul>
+							<li class="subitem1"><a href="search?page=1&feature=0">All </a></li>
 							<li class="subitem1"><a href="search?page=1&feature=1">Roll-in shower </a></li>
 							<li class="subitem2"><a href="search?page=1&feature=2">Free infant/kid's bed</a></li>
 							<li class="subitem3"><a href="search?page=1&feature=3">WI-FI facility</a></li>
@@ -102,7 +103,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 											</div>
 											<div class="hotel-left-two">
 												<div class="rating text-left">
-													<span><img alt="Customer Rating" src ="images/st{{customer_rating}}.png"</span>
+													<span><img alt="Customer Rating" src ="images/st{{#rating room_id}}{{this}}{{/rating}}.png"></span>
 												</div>
 												<div class="rating text-left">
 														<h5><b>Available Features</b></h5>	
@@ -120,7 +121,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 											<a style="background:white" href='wishlist?room_id={{room_id}}'>
 											<img id = "wishlistImg" src="images/wishlist1.png" title="Add to wishlist" onmouseover="this.src='images/wishlist2.png'" onmouseout="this.src='images/wishlist1.png'" /></a>									
 										</div>
-										<h4><span>{{price}}</span>{{price}}</h4>
+										<h4><span>{{#random price}}{{this}}{{/random}}</span>{{price}}</h4>
 										<p>Best price</p>
 										<a href="/single?room_id={{room_id}}&src=search">Continue</a>
 									</div>
