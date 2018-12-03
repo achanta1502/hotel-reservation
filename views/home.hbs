@@ -106,26 +106,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 							<option value="" selected disabled hidden>Choose your City</option>
 							{{#each obj1}}
 							<option value="{{hotel_id}}">{{city}}</option>
-							{{!-- <?php
-								require_once('config.php');
-								try{ 
-									echo "Entered"; 
-									$db = mysqli_connect(DBHOST, DBUSER, DBPASS, DBNAME);  
-									echo "Entered";
-									if ($db->connect_error) {
-										echo "Connected UNNNN successfully";
-										die("Connection failed: " . $db->connect_error);
-									} 
-									else echo "Connected successfully";
-									$query = "SELECT * FROM hotel where status=1";
-									$result = $db->query($query);	
-									while ($row = $result->fetch_assoc()) {
-										echo '<option value='.$row["hotel_id"].'>'.$row["city_name"].'</option>';					
-									}
-								}catch(Exception $ex){
-									echo $ex->getMessage(); 
-								}
-							?>        --}}
+						
 							{{/each}}
 						</select>
 					</div>

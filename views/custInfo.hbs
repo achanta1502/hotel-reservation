@@ -6,6 +6,7 @@
 			<div class="reservation-form">
 				<div class="col-md-9 reservation-right">
 					<form method="POST" action="/custInfo?id={{user_id}}" name="custInfo" class="edit">
+					<input type="hidden" name="userid" value="{{user_id}}" placeholder="Name" required>
 						<h4>Name</h4>         			
                         <input type="text" name="name" value="{{name1}}" placeholder="Name" required>
 						<h4>Email</h4>
